@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro Timer | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.pomo-wrap{max-width:460px;margin:0 auto 40px}
+.timer-circle{width:240px;height:240px;border-radius:50%;background:conic-gradient(var(--accent) 0deg, var(--card2) 0deg);display:flex;align-items:center;justify-content:center;margin:0 auto 32px;position:relative;box-shadow:0 0 60px rgba(255,215,0,.15)}
+.timer-circle::before{content:'';position:absolute;inset:12px;background:var(--card);border-radius:50%}
+.timer-inner{position:relative;text-align:center}
+.timer-time{font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1}
+.timer-label{font-size:13px;color:var(--muted);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:2px}
+.mode-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+.mode-btn{background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:10px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;text-align:center;transition:all .2s}
+.mode-btn.active{background:rgba(255,215,0,.15);border-color:var(--accent);color:var(--accent)}
+.ctrl-btns{display:flex;gap:12px;justify-content:center}
+.session-log{margin-top:24px}
+.session-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card2);border-radius:10px;margin-bottom:8px;font-size:13px;color:var(--muted)}
+.session-item i{color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"><i class="fa fa-clock" style="color:#fff"></i></div>
+      <h1>Pomodoro Timer</h1>
+      <p>Boost your productivity using the Pomodoro technique</p>
+    </div>
+
+    <div class="pomo-wrap">
+      <div class="card">
+        <div class="mode-btns">
+          <div class="mode-btn active" id="btn-pomodoro" onclick="setMode('pomodoro')">Pomodoro<br><small>25 min</small></div>
+          <div class="mode-btn" id="btn-short" onclick="setMode('short')">Short Break<br><small>5 min</small></div>
+          <div class="mode-btn" id="btn-long" onclick="setMode('long')">Long Break<br><small>15 min</small></div>
+        </div>
+
+        <div class="timer-circle" id="timerCircle">
+          <div class="timer-inner">
+            <div class="timer-time" id="timerDisplay">25:00</div>
+            <div class="timer-label" id="timerLabel">Focus</div>
+          </div>
+        </div>
+
+        <div class="ctrl-btns">
+          <button class="btn btn-primary" id="startBtn" onclick="toggleTimer()"><i class="fa fa-play"></i> Start</button>
+          <button class="btn btn-secondary" onclick="resetTimer()"><i class="fa fa-undo"></i> Reset</button>
+        </div>
+
+        <div style="display:flex;gap:20px;justify-content:center;margin-top:20px">
+          <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--accent)" id="pomodoroCount">0</div><div style="font-size:12px;color:var(--muted)">Sessions</div></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--accent)" id="totalFocus">0</div><div style="font-size:12px;color:var(--muted)">Min Focused</div></div>
+        </div>
+      </div>
+
+      <div class="session-log" id="sessionLog"></div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const modes={pomodoro:{time:25*60,label:'Focus'},short:{time:5*60,label:'Short Break'},long:{time:15*60,label:'Long Break'}};
+let mode='pomodoro',timeLeft=modes.pomodoro.time,running=false,interval=null,sessions=0,totalFocus=0,log=[];
+
+function setMode(m){
+  mode=m;running=false;clearInterval(interval);
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+m).classList.add('active');
+  timeLeft=modes[m].time;
+  updateDisplay();
+  document.getElementById('startBtn').innerHTML='<i class="fa fa-play"></i> Start';
+  document.getElementById('timerLabel').textContent=modes[m].label;
+  updateCircle();
+}
+function toggleTimer(){
+  if(running){running=false;clearInterval(interval);document.getElementById('startBtn').innerHTML='<i class="fa fa-play"></i> Resume';}
+  else{running=true;interval=setInterval(tick,1000);document.getElementById('startBtn').innerHTML='<i class="fa fa-pause"></i> Pause';}
+}
+function tick(){
+  if(timeLeft<=0){
+    clearInterval(interval);running=false;
+    if(mode==='pomodoro'){sessions++;totalFocus+=25;document.getElementById('pomodoroCount').textContent=sessions;document.getElementById('totalFocus').textContent=totalFocus;addLog('Pomodoro session completed! 🍅');}
+    else{addLog((mode==='short'?'Short':'Long')+' break done! Back to work 💪');}
+    new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAA==').play().catch(()=>{});
+    alert(mode==='pomodoro'?'Pomodoro complete! Time for a break!':'Break over! Time to focus!');
+    document.getElementById('startBtn').innerHTML='<i class="fa fa-play"></i> Start';
+    return;
+  }
+  timeLeft--;updateDisplay();updateCircle();
+}
+function resetTimer(){clearInterval(interval);running=false;timeLeft=modes[mode].time;updateDisplay();updateCircle();document.getElementById('startBtn').innerHTML='<i class="fa fa-play"></i> Start';}
+function updateDisplay(){
+  const m=Math.floor(timeLeft/60).toString().padStart(2,'0');
+  const s=(timeLeft%60).toString().padStart(2,'0');
+  document.getElementById('timerDisplay').textContent=m+':'+s;
+  document.title=m+':'+s+' — Pomodoro';
+}
+function updateCircle(){
+  const total=modes[mode].time;
+  const pct=(1-(timeLeft/total))*360;
+  document.getElementById('timerCircle').style.background=`conic-gradient(var(--accent) ${pct}deg, var(--card2) ${pct}deg)`;
+}
+function addLog(msg){
+  log.unshift({msg,time:new Date().toLocaleTimeString()});
+  if(log.length>5)log.pop();
+  document.getElementById('sessionLog').innerHTML=log.map(l=>`<div class="session-item"><i class="fa fa-check-circle"></i>${l.msg}<span style="margin-left:auto;font-size:11px">${l.time}</span></div>`).join('');
+}
+</script>
+</body>
+</html>

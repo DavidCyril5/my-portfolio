@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Enhancer | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.upload-zone{border:2px dashed var(--border);border-radius:16px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .3s;background:var(--card2)}
+.upload-zone:hover{border-color:var(--accent);background:rgba(255,215,0,0.04)}
+.upload-zone i{font-size:48px;color:var(--muted);margin-bottom:16px;display:block}
+.compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+.img-box{border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+.img-box img{width:100%;display:block;aspect-ratio:1;object-fit:cover}
+.img-label{background:var(--card2);padding:10px 16px;font-size:13px;color:var(--muted);font-weight:600;text-align:center}
+@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#fd746c,#ff9068)"><i class="fa fa-wand-magic-sparkles" style="color:#fff"></i></div>
+      <h1>Photo Enhancer</h1>
+      <p>Enhance and upscale your photos with AI — bring old photos back to life</p>
+      <div class="features" style="margin-top:16px">
+        <span class="tag tag-accent">AI-Powered</span>
+        <span class="tag tag-accent">Upscale</span>
+        <span class="tag">Sharpen</span>
+        <span class="tag">Restore</span>
+      </div>
+    </div>
+
+    <div style="max-width:700px;margin:0 auto 40px">
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="onFileSelected(event)">
+      <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+        <i class="fa fa-wand-magic-sparkles"></i>
+        <p style="font-size:16px;font-weight:600;margin-bottom:8px">Click to Upload Photo</p>
+        <p style="font-size:13px;color:var(--muted)">Supports JPG, PNG — best with faces or old photos</p>
+      </div>
+
+      <div id="loader" class="loader hidden"><div class="spinner"></div> Enhancing photo with AI...</div>
+      <div id="errorMsg" class="msg-error hidden"></div>
+
+      <div id="result" class="hidden">
+        <div class="compare-wrap">
+          <div class="img-box">
+            <div class="img-label"><i class="fa fa-image"></i> Original</div>
+            <img id="originalImg" alt="Original">
+          </div>
+          <div class="img-box">
+            <div class="img-label"><i class="fa fa-wand-magic-sparkles" style="color:var(--accent)"></i> Enhanced</div>
+            <img id="enhancedImg" alt="Enhanced">
+          </div>
+        </div>
+        <div class="result-actions" style="margin-top:16px">
+          <a id="downloadBtn" href="#" download="enhanced_photo.jpg" class="btn btn-primary"><i class="fa fa-download"></i> Download Enhanced</a>
+          <button onclick="document.getElementById('fileInput').click()" class="btn btn-secondary"><i class="fa fa-image"></i> Enhance Another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+const IMGBB_KEY='1fe5c36a643f15d1e5478c716f876a4c';
+function onFileSelected(e){const file=e.target.files[0];if(file)processFile(file);}
+
+async function processFile(file){
+  if(file.size>5*1024*1024){showError('File too large. Max 5MB.');return;}
+  show('loader');hide('errorMsg');hide('result');
+  const reader=new FileReader();
+  reader.onload=e=>document.getElementById('originalImg').src=e.target.result;
+  reader.readAsDataURL(file);
+
+  try{
+    const form=new FormData();
+    form.append('image',file);
+    const upRes=await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`,{method:'POST',body:form});
+    const upData=await upRes.json();
+    if(!upData.success)throw new Error('Upload failed');
+    const imgUrl=upData.data.url;
+
+    const r=await fetch(`${API}/remini?url=${encodeURIComponent(imgUrl)}`);
+    const d=await r.json();
+    if(d.status!==false&&(d.result||d.output||d.image)){
+      const enhUrl=d.result||d.output||d.image;
+      document.getElementById('enhancedImg').src=enhUrl;
+      document.getElementById('downloadBtn').href=enhUrl;
+      show('result');
+    } else {showError(d.error||'Enhancement failed. Try a clearer image.');}
+  } catch(e){showError('Error enhancing photo. Please try again with a different image.');}
+  hide('loader');
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

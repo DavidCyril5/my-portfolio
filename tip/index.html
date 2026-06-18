@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tip Calculator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.tip-btns{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.tip-btn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);transition:all .2s}
+.tip-btn:hover,.tip-btn.active{background:rgba(255,215,0,.1);border-color:var(--accent);color:var(--accent)}
+.result-card{background:var(--bg2);border-radius:14px;padding:20px;margin-top:8px}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:15px}
+.result-row:last-child{border-bottom:none;font-size:17px;font-weight:700}
+.result-row .amount{color:var(--accent);font-weight:700;font-family:monospace}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#f7971e,#ffd200)"><i class="fa fa-receipt" style="color:#fff"></i></div>
+      <h1>Tip Calculator</h1>
+      <p>Calculate tips and split bills easily</p>
+    </div>
+
+    <div style="max-width:480px;margin:0 auto 40px">
+      <div class="card">
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px">Bill Amount ($)</label>
+        <input id="bill" class="input-field" type="number" placeholder="0.00" min="0" oninput="calc()">
+
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:10px">Tip Percentage</label>
+        <div class="tip-btns">
+          <div class="tip-btn" onclick="setTip(10,this)">10%</div>
+          <div class="tip-btn active" onclick="setTip(15,this)">15%</div>
+          <div class="tip-btn" onclick="setTip(18,this)">18%</div>
+          <div class="tip-btn" onclick="setTip(20,this)">20%</div>
+          <div class="tip-btn" onclick="setTip(25,this)">25%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <label style="font-size:13px;color:var(--muted);white-space:nowrap">Custom %:</label>
+          <input id="customTip" class="input-field" type="number" placeholder="e.g. 12" style="margin:0;flex:1" oninput="setCustomTip()">
+        </div>
+
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px">Split Between</label>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <button class="btn btn-secondary" onclick="adjustPeople(-1)" style="width:44px;height:44px;padding:0;flex-shrink:0"><i class="fa fa-minus"></i></button>
+          <div style="text-align:center;flex:1"><span style="font-size:28px;font-weight:800;color:var(--accent)" id="peopleCount">2</span><div style="font-size:12px;color:var(--muted)">people</div></div>
+          <button class="btn btn-secondary" onclick="adjustPeople(1)" style="width:44px;height:44px;padding:0;flex-shrink:0"><i class="fa fa-plus"></i></button>
+        </div>
+
+        <div class="result-card">
+          <div class="result-row"><span>Bill</span><span class="amount" id="billDisplay">$0.00</span></div>
+          <div class="result-row"><span>Tip (<span id="tipPct2">15</span>%)</span><span class="amount" id="tipAmount">$0.00</span></div>
+          <div class="result-row"><span>Total</span><span class="amount" id="totalAmount">$0.00</span></div>
+          <div class="result-row" style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border)"><span style="color:var(--accent)">Per Person</span><span class="amount" style="font-size:22px;color:var(--accent)" id="perPerson">$0.00</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let tip=15,people=2;
+function setTip(t,el){tip=t;document.querySelectorAll('.tip-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');document.getElementById('customTip').value='';calc();}
+function setCustomTip(){tip=parseFloat(document.getElementById('customTip').value)||0;document.querySelectorAll('.tip-btn').forEach(b=>b.classList.remove('active'));calc();}
+function adjustPeople(d){people=Math.max(1,people+d);document.getElementById('peopleCount').textContent=people;calc();}
+function calc(){
+  const bill=parseFloat(document.getElementById('bill').value)||0;
+  const tipAmt=bill*(tip/100);
+  const total=bill+tipAmt;
+  const pp=total/people;
+  document.getElementById('billDisplay').textContent='$'+bill.toFixed(2);
+  document.getElementById('tipAmount').textContent='$'+tipAmt.toFixed(2);
+  document.getElementById('totalAmount').textContent='$'+total.toFixed(2);
+  document.getElementById('perPerson').textContent='$'+pp.toFixed(2);
+  document.getElementById('tipPct2').textContent=tip;
+}
+calc();
+</script>
+</body>
+</html>

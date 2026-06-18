@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Downloader | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#000,#333)"><i class="fab fa-tiktok" style="color:#fff"></i></div>
+      <h1>TikTok Downloader</h1>
+      <p>Download TikTok videos and audio without watermark — instantly</p>
+      <div class="features" style="margin-top:16px">
+        <span class="tag tag-accent">No Watermark</span>
+        <span class="tag tag-accent">MP3 Audio</span>
+        <span class="tag">HD Quality</span>
+        <span class="tag">Fast</span>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:680px;margin:0 auto 40px">
+      <div class="input-group">
+        <input id="urlInput" type="text" placeholder="Paste TikTok video URL here...">
+        <button class="btn btn-primary" onclick="download()"><i class="fa fa-search"></i> Fetch</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted)">Example: https://www.tiktok.com/@user/video/...</p>
+
+      <div id="loader" class="loader hidden"><div class="spinner"></div> Fetching video...</div>
+      <div id="errorMsg" class="msg-error hidden"></div>
+
+      <div id="result" class="hidden" style="margin-top:24px">
+        <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg2);border-radius:12px;margin-bottom:16px">
+          <img id="avatar" style="width:52px;height:52px;border-radius:50%;object-fit:cover" alt="">
+          <div>
+            <div id="nickname" style="font-weight:700;font-size:15px"></div>
+            <div id="desc" style="color:var(--muted);font-size:13px;margin-top:4px;max-width:500px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical"></div>
+          </div>
+        </div>
+        <div class="result-actions">
+          <a id="dlVideo" href="#" target="_blank" class="btn btn-primary"><i class="fa fa-video"></i> Download Video</a>
+          <a id="dlAudio" href="#" target="_blank" class="btn btn-secondary"><i class="fa fa-music"></i> Download Audio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+async function download(){
+  const url=document.getElementById('urlInput').value.trim();
+  if(!url){showError('Please enter a TikTok URL');return;}
+  show('loader');hide('errorMsg');hide('result');
+  try{
+    const r=await fetch(`${API}/download/tiktok?url=${encodeURIComponent(url)}`);
+    const d=await r.json();
+    if(d.success&&d.result){
+      const res=d.result;
+      document.getElementById('avatar').src=res.author?.avatar||'';
+      document.getElementById('nickname').textContent=res.author?.nickname||'TikTok User';
+      document.getElementById('desc').textContent=res.desc||'';
+      document.getElementById('dlVideo').href=res.video||'#';
+      document.getElementById('dlAudio').href=res.music||'#';
+      show('result');
+    } else {showError('Failed to fetch video. Please check the URL.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

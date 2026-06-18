@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator | Made By David Cyril</title>
+    <style>
+        :root {
+            --bg-color: #0f0f1a;
+            --display-bg: rgba(15, 15, 26, 0.7);
+            --button-bg: rgba(30, 30, 50, 0.7);
+            --button-hover: rgba(60, 60, 90, 0.9);
+            --primary-glow: #6a00ff;
+            --secondary-glow: #00d4ff;
+            --text-color: #e0e0ff;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light-mode {
+            --bg-color: #f0f0ff;
+            --display-bg: rgba(240, 240, 255, 0.7);
+            --button-bg: rgba(220, 220, 240, 0.7);
+            --button-hover: rgba(200, 200, 230, 0.9);
+            --primary-glow: #4a00e0;
+            --secondary-glow: #0095ff;
+            --text-color: #30305a;
+            --shadow: 0 8px 32px rgba(0, 0, 100, 0.1);
+            --border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .calculator {
+            width: 340px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            background: var(--display-bg);
+            box-shadow: var(--shadow);
+            border: var(--border);
+            overflow: hidden;
+            padding: 20px;
+            position: relative;
+        }
+
+        .display {
+            padding: 20px;
+            text-align: right;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                var(--primary-glow),
+                transparent
+            );
+            opacity: 0.1;
+            animation: rotateGlow 8s linear infinite;
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .expression {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            min-height: 24px;
+            word-break: break-all;
+        }
+
+        .result {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-top: 8px;
+            word-break: break-all;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            padding: 18px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            background: var(--button-bg);
+            color: var(--text-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        button:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.operator {
+            background: rgba(100, 0, 200, 0.3);
+            color: var(--primary-glow);
+        }
+
+        button.operator:hover {
+            background: rgba(120, 0, 220, 0.4);
+        }
+
+        button.equals {
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            color: white;
+        }
+
+        button.equals:hover {
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        button.clear {
+            background: rgba(200, 0, 0, 0.3);
+            color: #ff6b6b;
+        }
+
+        button.clear:hover {
+            background: rgba(220, 0, 0, 0.4);
+        }
+
+        button.function {
+            color: var(--secondary-glow);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--button-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background: var(--button-hover);
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 400px) {
+            .calculator {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <button class="theme-toggle" id="themeToggle">☀️</button>
+        <div class="display">
+            <div class="expression" id="expression"></div>
+            <div class="result" id="result">0</div>
+        </div>
+        <div class="buttons">
+            <button class="clear" onclick="clearAll()">AC</button>
+            <button class="function" onclick="backspace()">⌫</button>
+            <button class="function" onclick="appendOperator('%')">%</button>
+            <button class="operator" onclick="appendOperator('/')">÷</button>
+            
+            <button class="function" onclick="appendFunction('sqrt(')">√</button>
+            <button class="function" onclick="appendFunction('^')">^</button>
+            <button class="function" onclick="appendFunction('π')">π</button>
+            <button class="operator" onclick="appendOperator('*')">×</button>
+            
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="appendOperator('-')">−</button>
+            
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+            
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="equals" onclick="calculate()">=</button>
+            
+            <button class="zero" onclick="appendNumber('0')">0</button>
+            <button onclick="appendDecimal()">.</button>
+            <button class="function" onclick="appendFunction('(')">(</button>
+            <button class="function" onclick="appendFunction(')')">)</button>
+        </div>
+    </div>
+
+    <script>
+        let currentExpression = '';
+        let currentResult = '0';
+        let isDarkMode = true;
+
+        const expressionElement = document.getElementById('expression');
+        const resultElement = document.getElementById('result');
+        const themeToggle = document.getElementById('themeToggle');
+
+        function updateDisplay() {
+            expressionElement.textContent = currentExpression;
+            resultElement.textContent = currentResult;
+        }
+
+        function appendNumber(number) {
+            if (currentResult === '0' && number !== '0') {
+                currentResult = number;
+            } else if (currentResult !== '0') {
+                currentResult += number;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (!currentResult.includes('.')) {
+                currentResult += currentResult === '' ? '0.' : '.';
+                updateDisplay();
+            }
+        }
+
+        function appendOperator(operator) {
+            if (currentResult !== '') {
+                currentExpression += currentResult + ' ' + operator + ' ';
+                currentResult = '';
+                updateDisplay();
+            } else if (currentExpression !== '') {
+                currentExpression = currentExpression.slice(0, -3) + ' ' + operator + ' ';
+                updateDisplay();
+            }
+        }
+
+        function appendFunction(func) {
+            if (func === 'π') {
+                currentResult = Math.PI.toString();
+            } else if (func === '^') {
+                appendOperator('^');
+            } else if (func === 'sqrt(') {
+                currentExpression += 'Math.sqrt(';
+                currentResult = '';
+            } else {
+                currentExpression += func;
+            }
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentExpression = '';
+            currentResult = '0';
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (currentResult !== '') {
+                currentResult = currentResult.slice(0, -1);
+                if (currentResult === '') currentResult = '0';
+            } else if (currentExpression !== '') {
+                currentExpression = currentExpression.slice(0, -1);
+            }
+            updateDisplay();
+        }
+
+        function calculate() {
+            try {
+                let expr = currentExpression + currentResult;
+                expr = expr.replace(/\^/g, '**'); 
+                expr = expr.replace(/π/g, Math.PI.toString());
+                
+                if (expr.includes('Math.sqrt(')) {
+                 
+                    expr = expr.replace(/Math.sqrt\(([^)]+)\)/g, (match, inner) => {
+                        return `Math.sqrt(${eval(inner)})`;
+                    });
+                }
+
+                const result = eval(expr);
+                currentResult = result.toString();
+                currentExpression = '';
+                updateDisplay();
+            } catch (error) {
+                currentResult = 'Error';
+                updateDisplay();
+                setTimeout(() => {
+                    currentResult = '0';
+                    updateDisplay();
+                }, 1000);
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('light-mode');
+            themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+        });
+
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (/[0-9]/.test(key)) appendNumber(key);
+            else if (key === '.') appendDecimal();
+            else if (['+', '-', '*', '/', '%'].includes(key)) appendOperator(key);
+            else if (key === 'Enter') calculate();
+            else if (key === 'Escape') clearAll();
+            else if (key === 'Backspace') backspace();
+            else if (key === '^') appendFunction('^');
+            else if (key === 'p' && e.ctrlKey) appendFunction('π');
+            else if (key === '(') appendFunction('(');
+            else if (key === ')') appendFunction(')');
+        });
+    </script>
+</body>
+</html>

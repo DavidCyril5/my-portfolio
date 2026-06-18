@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallpaper Search | David Cyril</title>
+<meta name="description" content="Search and download beautiful HD and 4K wallpapers for free.">
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#FFD700;--p2:#FF9500;--dark:#0F0F0F;--card:#1E1E1E;--glass:rgba(30,30,30,0.85);--gb:rgba(255,255,255,0.1);--text:#fff;--muted:#aaa;--tr:all 0.3s cubic-bezier(0.25,0.8,0.25,1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;padding:20px;}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.12;}
+.o1{width:400px;height:400px;background:#FFD700;top:5%;left:-5%;animation:fl 18s ease-in-out infinite;}
+.o2{width:350px;height:350px;background:#FF9500;bottom:5%;right:-5%;animation:fl 22s ease-in-out infinite 3s;}
+.o3{width:300px;height:300px;background:#4facfe;top:50%;left:40%;animation:fl 15s ease-in-out infinite 6s;}
+@keyframes fl{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,-40px);}}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo i{font-size:1.8rem;background:linear-gradient(135deg,#FFD700,#FF9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo span{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,#FFD700,#FF9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.back{background:rgba(255,255,255,0.07);border:1px solid var(--gb);color:var(--muted)!important;padding:9px 20px;border-radius:30px;font-size:0.85rem;text-decoration:none;transition:var(--tr);}
+.back:hover{background:rgba(255,255,255,0.13);color:#fff!important;}
+.search-wrap{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--gb);border-radius:22px;padding:32px;max-width:1100px;margin:0 auto 28px;}
+h1{font-size:1.7rem;font-weight:700;margin-bottom:6px;}
+.sub{color:var(--muted);font-size:0.92rem;margin-bottom:22px;}
+.search-row{display:flex;gap:10px;}
+.sinput{flex:1;padding:15px 20px;background:var(--card);border:1.5px solid var(--gb);border-radius:14px;color:var(--text);font-size:1rem;font-family:'Poppins',sans-serif;outline:none;transition:var(--tr);}
+.sinput:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(255,215,0,0.12);}
+.sinput::placeholder{color:var(--muted);opacity:0.7;}
+.sbtn{background:linear-gradient(135deg,#FFD700,#FF9500);border:none;color:#000;padding:15px 28px;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sbtn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,215,0,0.3);}
+.cat-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.cchip{background:rgba(255,255,255,0.05);border:1px solid var(--gb);border-radius:20px;padding:6px 14px;font-size:0.8rem;color:var(--muted);cursor:pointer;transition:var(--tr);}
+.cchip:hover{border-color:var(--p);color:var(--p);}
+.spin-wrap{display:none;flex-direction:column;align-items:center;gap:18px;padding:40px 0;max-width:1100px;margin:0 auto;}
+.spin-wrap.show{display:flex;}
+.spinner{width:52px;height:52px;border:5px solid rgba(255,255,255,0.08);border-radius:50%;border-top-color:#FFD700;animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;max-width:1100px;margin:0 auto;}
+.wcard{border-radius:16px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:16/9;background:var(--card);}
+.wcard img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
+.wcard:hover img{transform:scale(1.06);}
+.wcard-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);opacity:0;transition:opacity 0.3s;display:flex;align-items:flex-end;padding:14px;}
+.wcard:hover .wcard-overlay{opacity:1;}
+.wdl{background:rgba(255,215,0,0.9);color:#000;padding:7px 14px;border-radius:8px;font-size:0.8rem;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;}
+.err{background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.25);border-radius:12px;padding:14px 18px;color:#ff6b6b;font-size:0.88rem;margin-top:12px;display:none;max-width:1100px;margin-left:auto;margin-right:auto;}
+.err.show{display:block;}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:0.82rem;}
+footer a{color:var(--p);}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div style="max-width:1140px;margin:0 auto;">
+  <div class="topbar">
+    <a href="/" class="logo"><i class="fa fa-image"></i><span>Wallpaper Search</span></a>
+    <a href="/" class="back"><i class="fa fa-arrow-left me-1"></i>Home</a>
+  </div>
+  <div class="search-wrap">
+    <h1><i class="fa fa-image me-2" style="color:var(--p)"></i>Wallpaper Search</h1>
+    <p class="sub">Search millions of HD and 4K wallpapers. Click any image to download.</p>
+    <div class="search-row">
+      <input class="sinput" id="q" type="text" placeholder="Search wallpapers — e.g. mountain, cyberpunk, anime...">
+      <button class="sbtn" onclick="search()"><i class="fa fa-search"></i>Search</button>
+    </div>
+    <div class="cat-chips">
+      <span class="cchip" onclick="qSearch('nature')">Nature</span>
+      <span class="cchip" onclick="qSearch('cyberpunk')">Cyberpunk</span>
+      <span class="cchip" onclick="qSearch('space')">Space</span>
+      <span class="cchip" onclick="qSearch('anime')">Anime</span>
+      <span class="cchip" onclick="qSearch('abstract')">Abstract</span>
+      <span class="cchip" onclick="qSearch('cars')">Cars</span>
+      <span class="cchip" onclick="qSearch('city night')">City Night</span>
+      <span class="cchip" onclick="qSearch('minimal')">Minimal</span>
+    </div>
+  </div>
+  <div class="err" id="err"></div>
+  <div class="spin-wrap" id="sw"><div class="spinner"></div><p style="color:var(--muted)">Searching wallpapers...</p></div>
+  <div class="grid" id="grid"></div>
+</div>
+<footer><p>Made by <a href="/">David Cyril</a></p></footer>
+<script>
+const API='https://apis.davidcyril.name.ng';
+function sh(id,v){document.getElementById(id).classList.toggle('show',v!==false);}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('show');}
+function qSearch(q){document.getElementById('q').value=q;search();}
+
+async function search(){
+  const q=document.getElementById('q').value.trim();
+  if(!q){showErr('Please enter a search term');return;}
+  document.getElementById('err').classList.remove('show');
+  document.getElementById('grid').innerHTML='';sh('sw');
+  try{
+    const r=await fetch(`${API}/googleimage?query=${encodeURIComponent(q+' wallpaper 4K HD')}&limit=20`);
+    const d=await r.json();sh('sw',false);
+    const imgs=d.results||d.images||d.data||d;
+    if(!imgs||!imgs.length){showErr('No wallpapers found. Try a different search term.');return;}
+    const grid=document.getElementById('grid');
+    imgs.forEach(img=>{
+      const url=img.url||img.image||img.src||img;
+      const dl=img.original||img.full||url;
+      if(!url)return;
+      grid.innerHTML+=`<div class="wcard"><img src="${url}" alt="wallpaper" loading="lazy" onerror="this.parentElement.style.display='none'"><div class="wcard-overlay"><a href="${dl}" target="_blank" download class="wdl"><i class="fa fa-download"></i>Download</a></div></div>`;
+    });
+  }catch(e){sh('sw',false);showErr('Failed to load wallpapers. Please try again.');}
+}
+
+document.getElementById('q').addEventListener('keypress',e=>{if(e.key==='Enter')search();});
+qSearch('nature 4K');
+</script>
+</body>
+</html>

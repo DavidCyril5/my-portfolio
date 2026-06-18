@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Generator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.inv-preview{background:#fff;color:#111;border-radius:16px;padding:40px;max-width:760px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.inv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:24px;border-bottom:3px solid #FFD700}
+.inv-title{font-size:42px;font-weight:900;color:#FFD700;letter-spacing:-1px}
+.inv-meta{text-align:right;font-size:14px;color:#555}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px}
+.inv-party h4{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600}
+.inv-party p{font-size:14px;color:#333;line-height:1.6}
+.inv-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+.inv-table th{background:#f5f5f5;padding:10px 14px;text-align:left;font-size:12px;color:#666;font-weight:600;text-transform:uppercase;border-bottom:2px solid #eee}
+.inv-table td{padding:10px 14px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#333}
+.inv-totals{margin-left:auto;max-width:260px}
+.inv-total-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;color:#555}
+.inv-total-final{border-top:2px solid #333;margin-top:8px;padding-top:8px;font-size:18px;font-weight:700;color:#111;display:flex;justify-content:space-between}
+.inv-note{margin-top:24px;padding:16px;background:#f9f9f9;border-radius:8px;font-size:13px;color:#666;border-left:3px solid #FFD700}
+/* Form styles */
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+.form-section h3{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.item-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:start}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container" style="max-width:900px">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#1a1a2e,#0f3460)"><i class="fa fa-file-invoice" style="color:var(--accent)"></i></div>
+      <h1>Invoice Generator</h1>
+      <p>Create professional invoices and download as PDF</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start">
+      <div>
+        <div class="form-section">
+          <h3><i class="fa fa-user" style="margin-right:8px"></i>From (Your Info)</h3>
+          <input id="fromName" class="input-field" placeholder="Your Name / Company" oninput="update()">
+          <input id="fromEmail" class="input-field" placeholder="Email" oninput="update()">
+          <input id="fromAddress" class="input-field" placeholder="Address" oninput="update()">
+        </div>
+        <div class="form-section">
+          <h3><i class="fa fa-building" style="margin-right:8px"></i>Bill To</h3>
+          <input id="toName" class="input-field" placeholder="Client Name" oninput="update()">
+          <input id="toEmail" class="input-field" placeholder="Client Email" oninput="update()">
+          <input id="toAddress" class="input-field" placeholder="Client Address" oninput="update()">
+        </div>
+        <div class="form-section">
+          <h3><i class="fa fa-file-alt" style="margin-right:8px"></i>Invoice Details</h3>
+          <div class="form-grid">
+            <div><label style="font-size:12px;color:var(--muted)">Invoice #</label><input id="invNum" class="input-field" value="INV-001" oninput="update()"></div>
+            <div><label style="font-size:12px;color:var(--muted)">Date</label><input id="invDate" class="input-field" type="date" style="color-scheme:dark" oninput="update()"></div>
+            <div><label style="font-size:12px;color:var(--muted)">Due Date</label><input id="invDue" class="input-field" type="date" style="color-scheme:dark" oninput="update()"></div>
+            <div><label style="font-size:12px;color:var(--muted)">Tax (%)</label><input id="taxRate" class="input-field" type="number" value="0" min="0" max="100" oninput="update()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h3><i class="fa fa-list" style="margin-right:8px"></i>Line Items</h3>
+          <div id="items"></div>
+          <button class="btn btn-secondary btn-sm" onclick="addItem()"><i class="fa fa-plus"></i> Add Item</button>
+        </div>
+        <div class="form-section">
+          <h3><i class="fa fa-sticky-note" style="margin-right:8px"></i>Notes</h3>
+          <textarea id="notes" class="input-field" rows="3" placeholder="Payment terms, thank you note..." oninput="update()"></textarea>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="printInvoice()"><i class="fa fa-print"></i> Print / Download PDF</button>
+      </div>
+
+      <div id="invoicePreview" class="inv-preview"></div>
+    </div>
+  </div>
+  <footer class="site-footer" style="margin-top:32px">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let items=[{desc:'Service/Product',qty:1,price:0}];
+const today=new Date().toISOString().slice(0,10);
+const due=new Date(Date.now()+30*864e5).toISOString().slice(0,10);
+document.getElementById('invDate').value=today;
+document.getElementById('invDue').value=due;
+document.getElementById('fromName').value='David Cyril';
+document.getElementById('fromEmail').value='Davidcyril209@gmail.com';
+
+function renderItems(){
+  document.getElementById('items').innerHTML=items.map((it,i)=>`
+    <div class="item-row">
+      <input class="input-field" style="margin:0" placeholder="Description" value="${it.desc}" oninput="items[${i}].desc=this.value;update()">
+      <input class="input-field" style="margin:0" type="number" placeholder="Qty" value="${it.qty}" min="0" oninput="items[${i}].qty=+this.value;update()">
+      <input class="input-field" style="margin:0" type="number" placeholder="Price" value="${it.price}" min="0" step="0.01" oninput="items[${i}].price=+this.value;update()">
+      <button class="btn btn-secondary" style="padding:8px;height:44px" onclick="removeItem(${i})"><i class="fa fa-trash"></i></button>
+    </div>
+  `).join('');
+}
+function addItem(){items.push({desc:'',qty:1,price:0});renderItems();update();}
+function removeItem(i){items.splice(i,1);if(!items.length)items=[{desc:'',qty:1,price:0}];renderItems();update();}
+
+function update(){
+  const subtotal=items.reduce((a,it)=>a+it.qty*it.price,0);
+  const tax=subtotal*(parseFloat(document.getElementById('taxRate').value)||0)/100;
+  const total=subtotal+tax;
+  const fn=document.getElementById('fromName').value;
+  const fe=document.getElementById('fromEmail').value;
+  const fa=document.getElementById('fromAddress').value;
+  const tn=document.getElementById('toName').value;
+  const te=document.getElementById('toEmail').value;
+  const ta=document.getElementById('toAddress').value;
+  const num=document.getElementById('invNum').value;
+  const date=document.getElementById('invDate').value;
+  const due=document.getElementById('invDue').value;
+  const notes=document.getElementById('notes').value;
+  const taxRate=document.getElementById('taxRate').value;
+  document.getElementById('invoicePreview').innerHTML=`
+    <div class="inv-header">
+      <div><div class="inv-title">INVOICE</div><div style="font-size:14px;color:#888;margin-top:4px">${fn||'Your Company'}</div></div>
+      <div class="inv-meta"><div style="font-size:12px;color:#888">Invoice No.</div><div style="font-size:18px;font-weight:700;color:#111">${num}</div><div style="margin-top:8px;font-size:12px;color:#888">Date: ${date}</div><div style="font-size:12px;color:#888">Due: ${due}</div></div>
+    </div>
+    <div class="inv-parties">
+      <div class="inv-party"><h4>From</h4><p><strong>${fn||'—'}</strong><br>${fe||''}<br>${fa||''}</p></div>
+      <div class="inv-party"><h4>Bill To</h4><p><strong>${tn||'—'}</strong><br>${te||''}<br>${ta||''}</p></div>
+    </div>
+    <table class="inv-table">
+      <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr></thead>
+      <tbody>${items.map(it=>`<tr><td>${it.desc||'—'}</td><td>${it.qty}</td><td>$${(+it.price).toFixed(2)}</td><td>$${(it.qty*it.price).toFixed(2)}</td></tr>`).join('')}</tbody>
+    </table>
+    <div class="inv-totals">
+      <div class="inv-total-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+      ${taxRate>0?`<div class="inv-total-row"><span>Tax (${taxRate}%)</span><span>$${tax.toFixed(2)}</span></div>`:''}
+      <div class="inv-total-final"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+    </div>
+    ${notes?`<div class="inv-note"><strong>Notes:</strong> ${notes}</div>`:''}
+    <div style="margin-top:32px;text-align:center;font-size:12px;color:#aaa">Thank you for your business!</div>
+  `;
+}
+function printInvoice(){
+  const content=document.getElementById('invoicePreview').outerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<html><head><title>Invoice</title><style>body{margin:0;padding:24px;background:#fff;font-family:sans-serif}${[...document.styleSheets].map(s=>{try{return[...s.cssRules].filter(r=>r.selectorText&&r.selectorText.includes('inv')).map(r=>r.cssText).join('\n')}catch{return''}}).join('\n')}</style></head><body>${content}</body></html>`);
+  w.document.close();w.print();
+}
+renderItems();update();
+</script>
+</body>
+</html>

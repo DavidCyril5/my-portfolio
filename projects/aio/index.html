@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All-in-One Downloader | David Cyril</title>
+<meta name="description" content="Download from 50+ platforms in one tool. Paste any URL and download instantly.">
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#FFD700;--p2:#FF9500;--dark:#0F0F0F;--card:#1E1E1E;--glass:rgba(30,30,30,0.85);--gb:rgba(255,255,255,0.1);--text:#fff;--muted:#aaa;--tr:all 0.3s cubic-bezier(0.25,0.8,0.25,1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;padding:20px;}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.15;}
+.o1{width:350px;height:350px;background:#FFD700;top:10%;left:5%;animation:fl 16s ease-in-out infinite;}
+.o2{width:420px;height:420px;background:#FF9500;top:60%;right:5%;animation:fl 20s ease-in-out infinite 3s;}
+.o3{width:280px;height:280px;background:#FF6B35;top:35%;left:50%;animation:fl 14s ease-in-out infinite 6s;}
+@keyframes fl{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,-40px);}}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo i{font-size:2rem;background:linear-gradient(135deg,#FFD700,#FF9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.logo span{font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#FFD700,#FF9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.back{background:rgba(255,255,255,0.07);border:1px solid var(--gb);color:var(--muted)!important;padding:9px 20px;border-radius:30px;font-size:0.85rem;text-decoration:none;transition:var(--tr);}
+.back:hover{background:rgba(255,255,255,0.13);color:#fff!important;}
+.box{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--gb);border-radius:22px;padding:40px;box-shadow:0 12px 50px rgba(0,0,0,0.4);max-width:840px;margin:0 auto;}
+h1{font-size:1.85rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;}
+.sub{color:var(--muted);font-size:0.93rem;margin-bottom:28px;}
+.platforms{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+.plat{background:rgba(255,255,255,0.05);border:1px solid var(--gb);border-radius:20px;padding:5px 12px;font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:5px;}
+input[type=url]{width:100%;padding:17px 20px;background:var(--card);border:1.5px solid var(--gb);border-radius:14px;color:var(--text);font-size:1rem;font-family:'Poppins',sans-serif;outline:none;transition:var(--tr);margin-bottom:14px;}
+input[type=url]:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(255,215,0,0.15);}
+input::placeholder{color:var(--muted);opacity:0.7;}
+.go{width:100%;padding:17px;background:linear-gradient(135deg,#FFD700,#FF9500);border:none;color:#000;font-size:1rem;font-weight:700;border-radius:14px;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(255,215,0,0.3);position:relative;overflow:hidden;}
+.go::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:0.5s;}
+.go:hover{transform:translateY(-2px);}
+.go:hover::before{left:100%;}
+.spin-wrap{display:none;flex-direction:column;align-items:center;gap:18px;padding:36px 0;}
+.spin-wrap.show{display:flex;}
+.spinner{width:56px;height:56px;border:5px solid rgba(255,255,255,0.08);border-radius:50%;border-top-color:#FFD700;animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.result{display:none;}
+.result.show{display:block;animation:fu 0.4s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.rcard{background:var(--card);border-radius:18px;overflow:hidden;}
+.rthumb{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;}
+.rthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.rinfo{padding:22px;}
+.rtitle{font-size:1.05rem;font-weight:600;margin-bottom:14px;}
+.dopts{display:flex;flex-wrap:wrap;gap:9px;}
+.dopt{background:rgba(255,255,255,0.08);border:1px solid var(--gb);color:#fff;padding:10px 16px;border-radius:11px;font-size:0.88rem;transition:var(--tr);display:flex;align-items:center;gap:7px;text-decoration:none;}
+.dopt:hover{background:linear-gradient(135deg,#FFD700,#FF9500);border-color:transparent;color:#000;transform:translateY(-2px);}
+.err{background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.25);border-radius:12px;padding:14px 18px;color:#ff6b6b;font-size:0.88rem;margin-top:12px;display:none;}
+.err.show{display:block;}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:0.82rem;}
+footer a{color:var(--p);}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div style="max-width:880px;margin:0 auto;">
+  <div class="topbar">
+    <a href="/" class="logo"><i class="fa fa-download"></i><span>All-in-One Downloader</span></a>
+    <a href="/" class="back"><i class="fa fa-arrow-left me-1"></i>Home</a>
+  </div>
+  <div class="box">
+    <h1><i class="fa fa-download me-2" style="color:var(--p)"></i>All-in-One Downloader</h1>
+    <p class="sub">One tool to download from 50+ platforms. Paste any video or media URL and go.</p>
+    <div class="platforms">
+      <span class="plat"><i class="fa-brands fa-youtube" style="color:#FF0000"></i>YouTube</span>
+      <span class="plat"><i class="fa-brands fa-tiktok"></i>TikTok</span>
+      <span class="plat"><i class="fa-brands fa-instagram" style="color:#E1306C"></i>Instagram</span>
+      <span class="plat"><i class="fa-brands fa-facebook" style="color:#1877F2"></i>Facebook</span>
+      <span class="plat"><i class="fa-brands fa-twitter" style="color:#1DA1F2"></i>Twitter</span>
+      <span class="plat"><i class="fa-brands fa-vimeo" style="color:#1ab7ea"></i>Vimeo</span>
+      <span class="plat"><i class="fa-brands fa-dailymotion"></i>Dailymotion</span>
+      <span class="plat"><i class="fa fa-plus"></i>40+ more</span>
+    </div>
+    <input type="url" id="url" placeholder="Paste any video URL from any platform...">
+    <button class="go" onclick="go()"><i class="fa fa-download"></i>Download Now</button>
+    <div class="err" id="err"></div>
+    <div class="spin-wrap" id="sw"><div class="spinner"></div><p style="color:var(--muted)">Detecting platform and fetching media...</p></div>
+    <div class="result mt-4" id="res">
+      <div class="rcard">
+        <div class="rthumb"><img id="img" src="" alt="" onerror="this.parentElement.style.display='none'"></div>
+        <div class="rinfo">
+          <div class="rtitle" id="title"></div>
+          <div class="dopts" id="dopts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><p>Made by <a href="/">David Cyril</a></p></footer>
+<script>
+const API='https://apis.davidcyril.name.ng';
+function sh(id,v){document.getElementById(id).classList.toggle('show',v!==false);}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('show');}
+async function go(){
+  const url=document.getElementById('url').value.trim();
+  if(!url){showErr('Please enter a URL');return;}
+  document.getElementById('err').classList.remove('show');sh('res',false);sh('sw');
+  try{
+    const r=await fetch(`${API}/download/aio?url=${encodeURIComponent(url)}`);
+    const d=await r.json();sh('sw',false);
+    if(!d||d.status===false){showErr(d.message||'Failed. This platform might not be supported.');return;}
+    const v=d.data||d;
+    document.getElementById('img').src=v.thumbnail||v.image||v.cover||'';
+    document.getElementById('title').textContent=v.title||v.description||'Media';
+    const opts=document.getElementById('dopts');opts.innerHTML='';
+    if(v.url)opts.innerHTML+=`<a href="${v.url}" target="_blank" class="dopt"><i class="fa fa-download"></i>Download</a>`;
+    if(v.hd)opts.innerHTML+=`<a href="${v.hd}" target="_blank" class="dopt"><i class="fa fa-hd"></i>HD Quality</a>`;
+    if(v.sd)opts.innerHTML+=`<a href="${v.sd}" target="_blank" class="dopt"><i class="fa fa-video"></i>SD Quality</a>`;
+    if(v.audio||v.mp3)opts.innerHTML+=`<a href="${v.audio||v.mp3}" target="_blank" class="dopt"><i class="fa fa-music"></i>Audio Only</a>`;
+    if(v.medias&&Array.isArray(v.medias))v.medias.forEach((m,i)=>{if(m.url)opts.innerHTML+=`<a href="${m.url}" target="_blank" class="dopt"><i class="fa fa-download"></i>${m.quality||'Download '+(i+1)}</a>`;});
+    if(!opts.innerHTML){showErr('No download links found. This URL might not be supported.');return;}
+    sh('res');
+  }catch(e){sh('sw',false);showErr('Network error. Please try again.');}
+}
+document.getElementById('url').addEventListener('keypress',e=>{if(e.key==='Enter')go();});
+</script>
+</body>
+</html>

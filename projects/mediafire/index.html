@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediaFire Downloader | David Cyril</title>
+<meta name="description" content="Get direct download links from MediaFire without ads. Free and instant.">
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#00BCD4;--p2:#0097A7;--dark:#0F0F0F;--card:#1E1E1E;--glass:rgba(30,30,30,0.85);--gb:rgba(255,255,255,0.1);--text:#fff;--muted:#aaa;--tr:all 0.3s cubic-bezier(0.25,0.8,0.25,1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;padding:20px;}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.18;}
+.o1{width:350px;height:350px;background:#00BCD4;top:10%;left:5%;animation:fl 16s ease-in-out infinite;}
+.o2{width:420px;height:420px;background:#0097A7;top:60%;right:5%;animation:fl 20s ease-in-out infinite 3s;}
+.o3{width:280px;height:280px;background:#26C6DA;top:35%;left:50%;animation:fl 14s ease-in-out infinite 6s;}
+@keyframes fl{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,-40px);}}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo i{color:var(--p);font-size:2rem;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.logo span{font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#00BCD4,#26C6DA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.back{background:rgba(255,255,255,0.07);border:1px solid var(--gb);color:var(--muted)!important;padding:9px 20px;border-radius:30px;font-size:0.85rem;text-decoration:none;transition:var(--tr);}
+.back:hover{background:rgba(255,255,255,0.13);color:#fff!important;}
+.box{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--gb);border-radius:22px;padding:40px;box-shadow:0 12px 50px rgba(0,0,0,0.4);max-width:840px;margin:0 auto;}
+h1{font-size:1.85rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;}
+.sub{color:var(--muted);font-size:0.93rem;margin-bottom:28px;}
+input[type=url]{width:100%;padding:17px 20px;background:var(--card);border:1.5px solid var(--gb);border-radius:14px;color:var(--text);font-size:1rem;font-family:'Poppins',sans-serif;outline:none;transition:var(--tr);margin-bottom:14px;}
+input[type=url]:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(0,188,212,0.15);}
+input::placeholder{color:var(--muted);opacity:0.7;}
+.go{width:100%;padding:17px;background:linear-gradient(135deg,#00BCD4,#26C6DA);border:none;color:#000;font-size:1rem;font-weight:700;border-radius:14px;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(0,188,212,0.3);position:relative;overflow:hidden;}
+.go::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:0.5s;}
+.go:hover{transform:translateY(-2px);}
+.go:hover::before{left:100%;}
+.spin-wrap{display:none;flex-direction:column;align-items:center;gap:18px;padding:36px 0;}
+.spin-wrap.show{display:flex;}
+.spinner{width:56px;height:56px;border:5px solid rgba(255,255,255,0.08);border-radius:50%;border-top-color:var(--p);animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.result{display:none;}
+.result.show{display:block;animation:fu 0.4s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.fcard{background:var(--card);border-radius:18px;padding:28px;text-align:center;}
+.ficon-wrap{width:80px;height:80px;background:rgba(0,188,212,0.1);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2.5rem;color:var(--p);}
+.fname{font-size:1.1rem;font-weight:600;margin-bottom:6px;}
+.fmeta{color:var(--muted);font-size:0.85rem;margin-bottom:20px;}
+.dopts{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;}
+.dopt{background:rgba(255,255,255,0.08);border:1px solid var(--gb);color:#fff;padding:12px 24px;border-radius:11px;font-size:0.9rem;transition:var(--tr);display:flex;align-items:center;gap:8px;text-decoration:none;}
+.dopt:hover{background:linear-gradient(135deg,#00BCD4,#26C6DA);border-color:transparent;color:#000;transform:translateY(-2px);}
+.err{background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.25);border-radius:12px;padding:14px 18px;color:#ff6b6b;font-size:0.88rem;margin-top:12px;display:none;}
+.err.show{display:block;}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:0.82rem;}
+footer a{color:var(--p);}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div style="max-width:880px;margin:0 auto;">
+  <div class="topbar">
+    <a href="/" class="logo"><i class="fa fa-fire-flame-curved"></i><span>MediaFire Downloader</span></a>
+    <a href="/" class="back"><i class="fa fa-arrow-left me-1"></i>Home</a>
+  </div>
+  <div class="box">
+    <h1><i class="fa fa-fire-flame-curved me-2" style="color:var(--p)"></i>MediaFire Downloader</h1>
+    <p class="sub">Get direct download links from MediaFire without clicking through ads. Instant and free.</p>
+    <input type="url" id="url" placeholder="Paste MediaFire URL — e.g. https://www.mediafire.com/file/...">
+    <button class="go" onclick="go()"><i class="fa fa-link"></i>Get Direct Link</button>
+    <div class="err" id="err"></div>
+    <div class="spin-wrap" id="sw"><div class="spinner"></div><p style="color:var(--muted)">Extracting direct link...</p></div>
+    <div class="result mt-4" id="res">
+      <div class="fcard">
+        <div class="ficon-wrap"><i class="fa fa-file-arrow-down"></i></div>
+        <div class="fname" id="fname"></div>
+        <div class="fmeta" id="fmeta"></div>
+        <div class="dopts" id="dopts"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><p>Made by <a href="/">David Cyril</a></p></footer>
+<script>
+const API='https://apis.davidcyril.name.ng';
+function sh(id,v){document.getElementById(id).classList.toggle('show',v!==false);}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('show');}
+async function go(){
+  const url=document.getElementById('url').value.trim();
+  if(!url||!url.includes('mediafire.com')){showErr('Please enter a valid MediaFire URL');return;}
+  document.getElementById('err').classList.remove('show');sh('res',false);sh('sw');
+  try{
+    const r=await fetch(`${API}/mediafire?url=${encodeURIComponent(url)}`);
+    const d=await r.json();sh('sw',false);
+    if(!d||d.status===false){showErr(d.message||'Failed. The file might have been deleted.');return;}
+    const v=d.data||d;
+    document.getElementById('fname').textContent=v.filename||v.name||v.title||'File';
+    document.getElementById('fmeta').innerHTML=`${v.size?'<span>Size: '+v.size+'</span>':''} ${v.type?'<span> · Type: '+v.type+'</span>':''}`;
+    const opts=document.getElementById('dopts');opts.innerHTML='';
+    const dl=v.url||v.download||v.link||v.direct;
+    if(dl)opts.innerHTML+=`<a href="${dl}" target="_blank" class="dopt"><i class="fa fa-download"></i>Download File</a>`;
+    if(!opts.innerHTML){showErr('No direct link found. File may be private or deleted.');return;}
+    sh('res');
+  }catch(e){sh('sw',false);showErr('Network error. Please try again.');}
+}
+document.getElementById('url').addEventListener('keypress',e=>{if(e.key==='Enter')go();});
+</script>
+</body>
+</html>

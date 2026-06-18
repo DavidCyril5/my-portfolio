@@ -1,0 +1,512 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Video Downloader | David Cryil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #a855f7;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --neomorphic-shadow: 8px 8px 16px #0b1120, 
+                               -8px -8px 16px #1a253e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(45deg, var(--dark), #1e293b);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 6rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            filter: blur(100px);
+            opacity: 0.15;
+            animation: float 6s infinite;
+        }
+
+        .title {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            box-shadow: var(--neomorphic-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .download-interface {
+            display: grid;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.2rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+        }
+
+        .download-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .quality-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .quality-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-30%, -50%) scale(1); }
+            50% { transform: translate(-20%, -55%) scale(1.1); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--glass);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="hero">
+            <h1 class="title">All Video Downloader</h1>
+            <p class="subtitle">Smart downloads from 50+ platforms</p>
+            
+            <div class="card download-interface">
+                <div class="input-group">
+                    <i class="fas fa-link input-icon"></i>
+                    <input type="text" id="videoUrl" placeholder="Paste video URL here...">
+                </div>
+                <button class="btn" onclick="downloadVideo()">
+                    <i class="fas fa-download"></i>
+                    Download Now
+                </button>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="result" class="card hidden">
+            <h2>Available Formats</h2>
+            <div class="download-options">
+                <a id="lowQualityLink" class="quality-card" target="_blank">
+                    <h3>Standard Quality</h3>
+                    <p>720p • MP4</p>
+                </a>
+                <a id="highQualityLink" class="quality-card" target="_blank">
+                    <h3>High Quality</h3>
+                    <p>1080p • MP4</p>
+                </a>
+            </div>
+        </section>
+        
+        <!-- Add this section below the features section -->
+<section class="card social-section">
+    <h2>Stay Connected</h2>
+    <p class="section-subtitle">Follow us for updates, tips, and new features</p>
+    
+    <div class="social-grid">
+        <!-- Twitter/X -->
+        <div class="social-card twitter">
+            <i class="fab fa-twitter"></i>
+            <div class="social-info">
+                <h3>Twitter/X</h3>
+                <p>Get quick updates and announcements</p>
+            </div>
+            <button class="btn social-btn" onclick="window.open('https://twitter.com', '_blank')">
+                Follow <span class="follower-count">2.5K+</span>
+            </button>
+        </div>
+
+        <!-- YouTube -->
+        <div class="social-card youtube">
+            <i class="fab fa-youtube"></i>
+            <div class="social-info">
+                <h3>YouTube</h3>
+                <p>Tutorials and feature guides</p>
+            </div>
+            <button class="btn social-btn" onclick="window.open('https://youtube.com/', '_blank')">
+                Subscribe <span class="follower-count">1.2K+</span>
+            </button>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="social-card discord">
+            <i class="fab fa-whatsapp"></i>
+            <div class="social-info">
+                <h3>WhatsApp</h3>
+                <p>Join our WhatsApp community</p>
+            </div>
+            <button class="btn social-btn" onclick="window.open('https://whatsapp.com/yourlink', '_blank')">
+                Join Server <span class="follower-count">16k+</span>
+            </button>
+        </div>
+
+        <!-- GitHub -->
+        <div class="social-card github">
+            <i class="fab fa-github"></i>
+            <div class="social-info">
+                <h3>GitHub</h3>
+                <p>Contribute to our open-source projects</p>
+            </div>
+            <button class="btn social-btn" onclick="window.open('https://github.com', '_blank')">
+                Star Repo <span class="follower-count">⭐ 5000+</span>
+            </button>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="social-card newsletter">
+            <i class="fas fa-envelope-open-text"></i>
+            <div class="social-info">
+                <h3>Newsletter</h3>
+                <p>Get updates straight to your inbox</p>
+            </div>
+            <div class="newsletter-form">
+                <input type="email" placeholder="Enter your email">
+                <button class="btn social-btn">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.social-section {
+    margin-top: 3rem;
+}
+
+.section-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.social-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15);
+}
+
+.social-card i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.social-info h3 {
+    margin-bottom: 0.5rem;
+}
+
+.social-info p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-btn:hover {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+}
+
+.follower-count {
+    margin-left: 0.5rem;
+    font-weight: 500;
+    color: var(--accent);
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.newsletter-form input {
+    flex: 1;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    border-radius: 8px;
+    color: white;
+}
+
+/* Platform-specific accents */
+.twitter { border-left: 4px solid #1DA1F2; }
+.youtube { border-left: 4px solid #FF0000; }
+.discord { border-left: 4px solid #5865F2; }
+.github { border-left: 4px solid #181717; }
+.newsletter { border-left: 4px solid #ec4899; }
+</style>
+
+        <section class="features">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-rocket feature-icon"></i>
+                    <div>
+                        <h3>Lightning Fast</h3>
+                        <p>AI-optimized download speeds</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <div>
+                        <h3>Secure</h3>
+                        <p>Encrypted & privacy-focused</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-infinity feature-icon"></i>
+                    <div>
+                        <h3>Unlimited</h3>
+                        <p>No restrictions or limits</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script>
+        async function downloadVideo() {
+            const videoUrl = document.getElementById("videoUrl").value.trim();
+            const progress = document.querySelector(".progress-fill");
+            const toast = document.getElementById("toast");
+
+            if (!videoUrl) {
+                showToast("⚠️ Please enter a video URL!", "error");
+                return;
+            }
+
+            progress.style.width = "100%";
+            
+            try {
+                const response = await fetch(`https://apis.davidcyriltech.my.id/download/aio?url=${encodeURIComponent(videoUrl)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast("✅ Download ready!", "success");
+                    updateDownloadLinks(data.video);
+                } else {
+                    throw new Error(data.error || "Download failed");
+                }
+            } catch (error) {
+                showToast(`❌ ${error.message}`, "error");
+            } finally {
+                progress.style.width = "0%";
+            }
+        }
+
+        function updateDownloadLinks(videoData) {
+            const resultSection = document.getElementById("result");
+            const lowQualityLink = document.getElementById("lowQualityLink");
+            const highQualityLink = document.getElementById("highQualityLink");
+
+            lowQualityLink.href = videoData.low_quality;
+            highQualityLink.href = videoData.high_quality;
+            resultSection.classList.remove("hidden");
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = `toast visible ${type}`;
+            setTimeout(() => {
+                toast.classList.remove("visible");
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

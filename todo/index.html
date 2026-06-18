@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Todo List | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.todo-item{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--card2);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;transition:all .2s;animation:slideIn .2s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.todo-item.done .todo-text{text-decoration:line-through;color:var(--muted)}
+.todo-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.todo-check.checked{background:var(--success);border-color:var(--success)}
+.todo-text{flex:1;font-size:15px;font-weight:500}
+.todo-del{color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;transition:color .2s}
+.todo-del:hover{color:var(--danger)}
+.filter-tabs{display:flex;gap:8px;margin-bottom:20px}
+.filter-tab{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;font-weight:500;transition:all .2s}
+.filter-tab.active{background:rgba(255,215,0,.1);border-color:var(--accent);color:var(--accent)}
+.empty-todo{text-align:center;padding:40px;color:var(--muted)}
+.empty-todo i{font-size:40px;display:block;margin-bottom:12px;color:rgba(255,255,255,.1)}
+.cat-select{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;cursor:pointer;outline:none}
+.priority-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#0f3460,#533483)"><i class="fa fa-list-check" style="color:var(--accent)"></i></div>
+      <h1>Todo List</h1>
+      <p>Stay organized and manage your tasks beautifully</p>
+    </div>
+
+    <div style="max-width:600px;margin:0 auto 40px">
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <input id="todoInput" class="input-field" type="text" placeholder="Add a new task..." style="margin-bottom:0;flex:1" onkeypress="if(event.key==='Enter')addTodo()">
+          <select id="priority" class="cat-select">
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="addTodo()"><i class="fa fa-plus"></i> Add Task</button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div class="filter-tabs">
+          <div class="filter-tab active" onclick="setFilter('all',this)">All <span id="countAll" style="margin-left:4px"></span></div>
+          <div class="filter-tab" onclick="setFilter('active',this)">Active</div>
+          <div class="filter-tab" onclick="setFilter('done',this)">Done</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="clearDone()"><i class="fa fa-broom"></i> Clear Done</button>
+      </div>
+
+      <div id="todoList"></div>
+      <div style="color:var(--muted);font-size:13px;text-align:center;margin-top:12px" id="todoStats"></div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let todos=JSON.parse(localStorage.getItem('dcTodos')||'[]');
+let filter='all';
+const priorityColors={high:'#ff4757',normal:'var(--accent)',low:'#2ed573'};
+
+function addTodo(){
+  const text=document.getElementById('todoInput').value.trim();
+  if(!text)return;
+  todos.unshift({id:Date.now(),text,done:false,priority:document.getElementById('priority').value,created:new Date().toLocaleDateString()});
+  document.getElementById('todoInput').value='';
+  save();render();
+}
+function toggle(id){const t=todos.find(t=>t.id===id);if(t)t.done=!t.done;save();render();}
+function del(id){todos=todos.filter(t=>t.id!==id);save();render();}
+function clearDone(){todos=todos.filter(t=>!t.done);save();render();}
+function setFilter(f,el){filter=f;document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');render();}
+function save(){localStorage.setItem('dcTodos',JSON.stringify(todos));}
+function render(){
+  const list=document.getElementById('todoList');
+  const filtered=filter==='all'?todos:filter==='done'?todos.filter(t=>t.done):todos.filter(t=>!t.done);
+  if(!filtered.length){list.innerHTML='<div class="empty-todo"><i class="fa fa-list-check"></i>No tasks here!</div>';return;}
+  list.innerHTML=filtered.map(t=>`
+    <div class="todo-item${t.done?' done':''}">
+      <div class="priority-dot" style="background:${priorityColors[t.priority]}"></div>
+      <div class="todo-check${t.done?' checked':''}" onclick="toggle(${t.id})">${t.done?'<i class="fa fa-check" style="font-size:10px;color:#fff"></i>':''}</div>
+      <span class="todo-text">${t.text}</span>
+      <span style="font-size:11px;color:var(--muted)">${t.created}</span>
+      <i class="fa fa-trash todo-del" onclick="del(${t.id})"></i>
+    </div>
+  `).join('');
+  const done=todos.filter(t=>t.done).length;
+  document.getElementById('countAll').textContent=`(${todos.length})`;
+  document.getElementById('todoStats').textContent=`${done} of ${todos.length} tasks completed`;
+}
+render();
+</script>
+</body>
+</html>

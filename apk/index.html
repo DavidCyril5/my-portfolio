@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APK Downloader | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#11998e,#38ef7d)"><i class="fab fa-android" style="color:#fff"></i></div>
+      <h1>APK Downloader</h1>
+      <p>Search and download Android APK files — find any app</p>
+      <div class="features" style="margin-top:16px">
+        <span class="tag tag-accent">Latest Version</span>
+        <span class="tag tag-accent">Safe Downloads</span>
+        <span class="tag">All Android Apps</span>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:680px;margin:0 auto 40px">
+      <div class="input-group">
+        <input id="searchInput" type="text" placeholder="Search for an Android app...">
+        <button class="btn btn-primary" onclick="search()"><i class="fa fa-search"></i> Search</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted)">Example: WhatsApp, Instagram, PUBG, Minecraft...</p>
+
+      <div id="loader" class="loader hidden"><div class="spinner"></div> Searching...</div>
+      <div id="errorMsg" class="msg-error hidden"></div>
+
+      <div id="result" class="hidden" style="margin-top:24px">
+        <div style="display:flex;gap:20px;align-items:center;background:var(--bg2);padding:20px;border-radius:14px">
+          <img id="appIcon" style="width:80px;height:80px;border-radius:16px;object-fit:cover;flex-shrink:0" alt="">
+          <div style="flex:1">
+            <h3 id="appName" style="font-size:18px;font-weight:700;margin-bottom:4px"></h3>
+            <p id="appVersion" style="color:var(--muted);font-size:13px;margin-bottom:4px"></p>
+            <p id="appSize" style="color:var(--muted);font-size:13px"></p>
+          </div>
+        </div>
+        <div class="result-actions" style="margin-top:16px">
+          <a id="dlApk" href="#" target="_blank" class="btn btn-primary btn-full"><i class="fab fa-android"></i> Download APK</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+async function search(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q){showError('Please enter an app name');return;}
+  show('loader');hide('errorMsg');hide('result');
+  try{
+    const r=await fetch(`${API}/download/apk?text=${encodeURIComponent(q)}`);
+    const d=await r.json();
+    if(d.status&&d.apk){
+      const a=d.apk;
+      document.getElementById('appIcon').src=a.thumbnail||a.icon||'';
+      document.getElementById('appName').textContent=a.name||a.apk_name||'Unknown App';
+      document.getElementById('appVersion').textContent='Version: '+(a.version||'Latest');
+      document.getElementById('appSize').textContent=a.size?'Size: '+a.size:'';
+      document.getElementById('dlApk').href=a.download_link||a.apk_url||'#';
+      show('result');
+    } else {showError('App not found. Try a different search term.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Downloader | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)"><i class="fab fa-instagram"></i></div>
+      <h1>Instagram Downloader</h1>
+      <p>Download Instagram Reels and videos — no login required</p>
+      <div class="features" style="margin-top:16px">
+        <span class="tag tag-accent">Reels</span>
+        <span class="tag tag-accent">Videos</span>
+        <span class="tag">Fast</span>
+        <span class="tag">Free</span>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:680px;margin:0 auto 40px">
+      <div class="input-group">
+        <input id="urlInput" type="text" placeholder="Paste Instagram Reel URL here...">
+        <button class="btn btn-primary" onclick="download()"><i class="fa fa-search"></i> Fetch</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted)">Only Instagram Reel URLs are supported. Example: https://www.instagram.com/reel/...</p>
+
+      <div id="loader" class="loader hidden"><div class="spinner"></div> Fetching video...</div>
+      <div id="errorMsg" class="msg-error hidden"></div>
+
+      <div id="result" class="hidden" style="margin-top:24px">
+        <img id="thumb" style="width:100%;border-radius:12px;max-height:350px;object-fit:cover" alt="">
+        <div class="result-actions" style="margin-top:16px">
+          <a id="dlVideo" href="#" target="_blank" class="btn btn-primary"><i class="fa fa-download"></i> Download Video</a>
+          <a id="dlAudio" href="#" target="_blank" class="btn btn-secondary" style="display:none"><i class="fa fa-music"></i> Download Audio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+async function download(){
+  const url=document.getElementById('urlInput').value.trim();
+  if(!url){showError('Please enter an Instagram Reel URL');return;}
+  show('loader');hide('errorMsg');hide('result');
+  try{
+    const r=await fetch(`${API}/instagram?url=${encodeURIComponent(url)}`);
+    const d=await r.json();
+    if(d.success&&d.result){
+      const res=d.result;
+      const vidUrl=res.video||res.url||res.download_url||'#';
+      const thumbUrl=res.thumbnail||res.cover||'';
+      document.getElementById('thumb').src=thumbUrl;
+      document.getElementById('thumb').style.display=thumbUrl?'block':'none';
+      document.getElementById('dlVideo').href=vidUrl;
+      if(res.audio){document.getElementById('dlAudio').href=res.audio;document.getElementById('dlAudio').style.display='inline-flex';}
+      show('result');
+    } else {showError(d.message||'Failed to fetch video. Only Reel URLs are supported.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

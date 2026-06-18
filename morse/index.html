@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morse Code Translator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.morse-output{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:20px;min-height:120px;font-family:'Courier New',monospace;font-size:18px;letter-spacing:4px;line-height:1.8;color:var(--accent);word-break:break-all}
+.morse-ref{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:16px}
+.morse-char{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;font-size:12px}
+.morse-char .ch{font-weight:700;font-size:14px;color:var(--accent)}
+.morse-char .code{font-family:monospace;color:var(--muted);font-size:11px;margin-top:2px}
+.tabs{display:flex;background:var(--card2);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.tab{flex:1;padding:12px;text-align:center;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);transition:all .2s}
+.tab.active{background:var(--accent);color:#000}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#434343,#000000)"><i class="fa fa-signal" style="color:var(--accent)"></i></div>
+      <h1>Morse Code Translator</h1>
+      <p>Translate text to Morse code and back, with audio playback</p>
+    </div>
+
+    <div style="max-width:680px;margin:0 auto 40px">
+      <div class="card">
+        <div class="tabs">
+          <div class="tab active" id="t2mTab" onclick="setMode('t2m')"><i class="fa fa-arrow-right"></i> Text to Morse</div>
+          <div class="tab" id="m2tTab" onclick="setMode('m2t')"><i class="fa fa-arrow-left"></i> Morse to Text</div>
+        </div>
+
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px" id="inputLabel">Enter text to translate</label>
+        <textarea id="input" class="input-field" rows="4" placeholder="Type something..." oninput="translate()" style="font-size:16px"></textarea>
+
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <button class="btn btn-primary btn-sm" onclick="playMorse()" id="playBtn" disabled><i class="fa fa-volume-up"></i> Play Audio</button>
+          <button class="btn btn-secondary btn-sm" onclick="copyOutput()"><i class="fa fa-copy"></i> Copy</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearAll()"><i class="fa fa-trash"></i> Clear</button>
+        </div>
+
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px" id="outputLabel">Morse Code</label>
+        <div class="morse-output" id="output">—</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <p style="font-size:14px;font-weight:600;margin-bottom:12px"><i class="fa fa-book" style="color:var(--accent);margin-right:8px"></i>Morse Code Reference</p>
+        <div class="morse-ref" id="morseRef"></div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const MORSE={'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---','K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-','U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..','0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.'};
+const RMORSE=Object.fromEntries(Object.entries(MORSE).map(([k,v])=>[v,k]));
+let mode='t2m';
+function setMode(m){mode=m;document.getElementById('t2mTab').classList.toggle('active',m==='t2m');document.getElementById('m2tTab').classList.toggle('active',m==='m2t');document.getElementById('inputLabel').textContent=m==='t2m'?'Enter text to translate':'Enter Morse code (use spaces between letters, / for word space)';document.getElementById('outputLabel').textContent=m==='t2m'?'Morse Code':'Decoded Text';document.getElementById('input').placeholder=m==='t2m'?'Type something...':'.. - / .. ...';translate();}
+function translate(){
+  const inp=document.getElementById('input').value.toUpperCase();
+  let out='';
+  if(mode==='t2m'){
+    out=inp.split('').map(c=>{if(c===' ')return '/';return MORSE[c]||'?';}).join(' ');
+  } else {
+    out=inp.split(' / ').map(word=>word.split(' ').map(code=>RMORSE[code]||'?').join('')).join(' ');
+  }
+  document.getElementById('output').textContent=out||'—';
+  document.getElementById('playBtn').disabled=!inp.trim();
+}
+function clearAll(){document.getElementById('input').value='';translate();}
+function copyOutput(){navigator.clipboard.writeText(document.getElementById('output').textContent);}
+
+let ctx=null;
+async function playMorse(){
+  if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const txt=mode==='t2m'?document.getElementById('output').textContent:document.getElementById('input').value.toUpperCase();
+  const dot=0.1,dash=dot*3,gap=dot,lgap=dot*3,wgap=dot*7;
+  let t=ctx.currentTime+0.1;
+  const beep=(dur)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=700;g.gain.setValueAtTime(0.5,t);o.start(t);o.stop(t+dur);t+=dur;};
+  const pause=(dur)=>{t+=dur;};
+  (mode==='t2m'?txt:txt.split('').map(c=>(MORSE[c]||'')+(c===' '?'/':'')).join(' ')).split(' ').forEach(sym=>{
+    if(sym==='/')pause(wgap);
+    else{[...sym].forEach((s,i)=>{if(i>0)pause(gap);if(s==='.')beep(dot);else if(s==='-')beep(dash);});pause(lgap);}
+  });
+}
+
+// Build reference
+const ref=document.getElementById('morseRef');
+Object.entries(MORSE).forEach(([c,m])=>{const d=document.createElement('div');d.className='morse-char';d.innerHTML=`<div class="ch">${c}</div><div class="code">${m}</div>`;ref.appendChild(d);});
+</script>
+</body>
+</html>

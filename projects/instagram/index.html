@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Downloader | David Cyril</title>
+<meta name="description" content="Download Instagram videos, reels, stories and photos in high quality. Free.">
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#E1306C;--p2:#833AB4;--grad:linear-gradient(45deg,#405DE6,#5851DB,#833AB4,#C13584,#E1306C,#FD1D1D);--dark:#0F0F0F;--card:#1E1E1E;--glass:rgba(30,30,30,0.85);--gb:rgba(255,255,255,0.1);--text:#fff;--muted:#aaa;--tr:all 0.3s cubic-bezier(0.25,0.8,0.25,1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;padding:20px;}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.18;}
+.o1{width:350px;height:350px;background:#405DE6;top:10%;left:5%;animation:fl 16s ease-in-out infinite;}
+.o2{width:420px;height:420px;background:#C13584;top:55%;right:5%;animation:fl 20s ease-in-out infinite 3s;}
+.o3{width:280px;height:280px;background:#FD1D1D;top:35%;left:50%;animation:fl 14s ease-in-out infinite 6s;}
+@keyframes fl{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,-40px);}}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo i{font-size:2rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.logo span{font-size:1.5rem;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.back{background:rgba(255,255,255,0.07);border:1px solid var(--gb);color:var(--muted)!important;padding:9px 20px;border-radius:30px;font-size:0.85rem;text-decoration:none;transition:var(--tr);}
+.back:hover{background:rgba(255,255,255,0.13);color:#fff!important;}
+.box{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--gb);border-radius:22px;padding:40px;box-shadow:0 12px 50px rgba(0,0,0,0.4);max-width:840px;margin:0 auto;}
+h1{font-size:1.85rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;}
+.sub{color:var(--muted);font-size:0.93rem;margin-bottom:28px;}
+input[type=url]{width:100%;padding:17px 20px;background:var(--card);border:1.5px solid var(--gb);border-radius:14px;color:var(--text);font-size:1rem;font-family:'Poppins',sans-serif;outline:none;transition:var(--tr);margin-bottom:14px;}
+input[type=url]:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(225,48,108,0.15);}
+input::placeholder{color:var(--muted);opacity:0.7;}
+.go{width:100%;padding:17px;background:var(--grad);border:none;color:#fff;font-size:1rem;font-weight:700;border-radius:14px;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(225,48,108,0.3);position:relative;overflow:hidden;}
+.go::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:0.5s;}
+.go:hover{transform:translateY(-2px);}
+.go:hover::before{left:100%;}
+.spin-wrap{display:none;flex-direction:column;align-items:center;gap:18px;padding:36px 0;}
+.spin-wrap.show{display:flex;}
+.spinner{width:56px;height:56px;border:5px solid rgba(255,255,255,0.08);border-radius:50%;border-top-color:#E1306C;animation:spin 0.9s linear infinite;position:relative;}
+.spinner::after{content:'';position:absolute;inset:-5px;border:5px solid transparent;border-radius:50%;border-top-color:#405DE6;animation:spin 1.4s linear infinite reverse;opacity:0.6;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.result{display:none;}
+.result.show{display:block;animation:fu 0.4s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.mcard{background:var(--card);border-radius:18px;overflow:hidden;}
+.mthumb{position:relative;width:100%;max-width:400px;margin:0 auto;padding-bottom:100%;overflow:hidden;}
+.mthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.minfo{padding:22px;}
+.mtitle{font-size:1.05rem;font-weight:600;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.mmeta{display:flex;gap:12px;color:var(--muted);font-size:0.83rem;margin-bottom:18px;flex-wrap:wrap;}
+.dopts{display:flex;flex-wrap:wrap;gap:9px;}
+.dopt{background:rgba(255,255,255,0.08);border:1px solid var(--gb);color:#fff;padding:10px 16px;border-radius:11px;font-size:0.88rem;transition:var(--tr);display:flex;align-items:center;gap:7px;text-decoration:none;}
+.dopt:hover{background:var(--grad);border-color:transparent;color:#fff;transform:translateY(-2px);}
+.err{background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.25);border-radius:12px;padding:14px 18px;color:#ff6b6b;font-size:0.88rem;margin-top:12px;display:none;}
+.err.show{display:block;}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:0.82rem;}
+footer a{color:var(--p);}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div style="max-width:880px;margin:0 auto;">
+  <div class="topbar">
+    <a href="/" class="logo"><i class="fa-brands fa-instagram"></i><span>Insta Downloader</span></a>
+    <a href="/" class="back"><i class="fa fa-arrow-left me-1"></i>Home</a>
+  </div>
+  <div class="box">
+    <h1><i class="fa-brands fa-instagram me-2" style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>Instagram Downloader</h1>
+    <p class="sub">Download Instagram videos, reels, photos and stories in high quality. Paste the post URL below.</p>
+    <input type="url" id="url" placeholder="Paste Instagram URL — e.g. https://www.instagram.com/p/...">
+    <button class="go" onclick="go()"><i class="fa fa-download"></i>Download</button>
+    <div class="err" id="err"></div>
+    <div class="spin-wrap" id="sw"><div class="spinner"></div><p style="color:var(--muted)">Fetching media info...</p></div>
+    <div class="result mt-4" id="res">
+      <div class="mcard">
+        <div class="mthumb"><img id="img" src="" alt=""></div>
+        <div class="minfo">
+          <div class="mtitle" id="title"></div>
+          <div class="mmeta"><span><i class="fa fa-user me-1"></i><span id="auth"></span></span><span><i class="fa fa-heart me-1"></i><span id="likes"></span></span></div>
+          <div class="dopts" id="dopts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><p>Made by <a href="/">David Cyril</a></p></footer>
+<script>
+const API='https://apis.davidcyril.name.ng';
+function sh(id,v){document.getElementById(id).classList.toggle('show',v!==false);}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('show');}
+async function go(){
+  const url=document.getElementById('url').value.trim();
+  if(!url||!url.includes('instagram.com')){showErr('Please enter a valid Instagram URL');return;}
+  document.getElementById('err').classList.remove('show');sh('res',false);sh('sw');
+  try{
+    const r=await fetch(`${API}/instagram?url=${encodeURIComponent(url)}`);
+    const d=await r.json();sh('sw',false);
+    if(!d||d.status===false){showErr(d.message||'Failed to fetch. Try a different URL.');return;}
+    const v=d.data||d;
+    document.getElementById('img').src=v.thumbnail||v.image||v.cover||'';
+    document.getElementById('title').textContent=v.title||v.caption||v.description||'Instagram Media';
+    document.getElementById('auth').textContent=v.author||v.username||v.owner||'';
+    document.getElementById('likes').textContent=v.likes?v.likes+' likes':'';
+    const opts=document.getElementById('dopts');opts.innerHTML='';
+    const dl=v.url||v.video||v.download||v.media;
+    if(dl)opts.innerHTML+=`<a href="${dl}" target="_blank" class="dopt"><i class="fa fa-download"></i>Download</a>`;
+    if(v.medias&&Array.isArray(v.medias))v.medias.forEach((m,i)=>{opts.innerHTML+=`<a href="${m.url||m}" target="_blank" class="dopt"><i class="fa fa-photo-film"></i>Media ${i+1}</a>`;});
+    if(!opts.innerHTML){showErr('No download links found. Make sure the post is public.');return;}
+    sh('res');
+  }catch(e){sh('sw',false);showErr('Network error. Please try again.');}
+}
+document.getElementById('url').addEventListener('keypress',e=>{if(e.key==='Enter')go();});
+</script>
+</body>
+</html>

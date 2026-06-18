@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes App | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.notes-layout{display:grid;grid-template-columns:260px 1fr;gap:16px;height:calc(100vh - 200px);min-height:400px}
+.notes-sidebar{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.notes-sidebar-head{padding:16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:10px}
+.notes-list{flex:1;overflow-y:auto;padding:8px}
+.note-item{padding:12px 14px;border-radius:10px;cursor:pointer;margin-bottom:4px;transition:all .2s;border:1px solid transparent}
+.note-item:hover{background:var(--card2)}
+.note-item.active{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.3)}
+.note-item h4{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.note-item p{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-item .time{font-size:10px;color:var(--muted);margin-top:4px}
+.note-editor{background:var(--card);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;overflow:hidden}
+.note-editor-head{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.note-title-input{background:none;border:none;color:var(--text);font-size:18px;font-weight:700;flex:1;outline:none;font-family:inherit}
+.note-body{flex:1;padding:20px;resize:none;background:transparent;border:none;color:var(--text);font-size:15px;line-height:1.8;outline:none;font-family:inherit}
+.empty-note{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-direction:column;gap:12px}
+.empty-note i{font-size:48px;color:rgba(255,255,255,.1)}
+@media(max-width:680px){.notes-layout{grid-template-columns:1fr;height:auto}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container" style="max-width:1000px;padding-top:20px">
+    <div class="notes-layout">
+      <div class="notes-sidebar">
+        <div class="notes-sidebar-head">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:700"><i class="fa fa-sticky-note" style="color:var(--accent);margin-right:8px"></i>My Notes</span>
+            <button class="btn btn-primary btn-sm" onclick="newNote()"><i class="fa fa-plus"></i></button>
+          </div>
+          <input id="searchNotes" class="input-field" type="text" placeholder="Search notes..." style="margin:0;font-size:13px" oninput="renderList()">
+        </div>
+        <div class="notes-list" id="notesList"></div>
+      </div>
+
+      <div class="note-editor" id="editor" style="display:none">
+        <div class="note-editor-head">
+          <input id="noteTitle" class="note-title-input" placeholder="Note title..." oninput="saveNote()">
+          <button class="btn btn-secondary btn-sm" onclick="deleteNote()"><i class="fa fa-trash"></i></button>
+          <button class="btn btn-primary btn-sm" onclick="copyNote()"><i class="fa fa-copy"></i></button>
+        </div>
+        <textarea id="noteBody" class="note-body" placeholder="Start writing your note..." oninput="saveNote()"></textarea>
+        <div style="padding:10px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)" id="noteInfo"></div>
+      </div>
+      <div class="note-editor" id="emptyEditor">
+        <div class="empty-note"><i class="fa fa-sticky-note"></i><p>Select a note or create a new one</p><button class="btn btn-primary btn-sm" onclick="newNote()"><i class="fa fa-plus"></i> New Note</button></div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer" style="margin-top:24px">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let notes=JSON.parse(localStorage.getItem('dcNotes')||'[]');
+let activeId=null;
+
+function newNote(){
+  const note={id:Date.now(),title:'Untitled Note',body:'',created:new Date().toLocaleString(),updated:new Date().toLocaleString()};
+  notes.unshift(note);save();setActive(note.id);renderList();
+}
+function setActive(id){
+  activeId=id;
+  const note=notes.find(n=>n.id===id);
+  if(!note)return;
+  document.getElementById('emptyEditor').style.display='none';
+  document.getElementById('editor').style.display='flex';
+  document.getElementById('noteTitle').value=note.title;
+  document.getElementById('noteBody').value=note.body;
+  updateInfo(note);renderList();
+}
+function saveNote(){
+  const note=notes.find(n=>n.id===activeId);
+  if(!note)return;
+  note.title=document.getElementById('noteTitle').value||'Untitled';
+  note.body=document.getElementById('noteBody').value;
+  note.updated=new Date().toLocaleString();
+  save();updateInfo(note);renderList();
+}
+function deleteNote(){
+  notes=notes.filter(n=>n.id!==activeId);
+  activeId=null;
+  document.getElementById('editor').style.display='none';
+  document.getElementById('emptyEditor').style.display='flex';
+  save();renderList();
+}
+function copyNote(){navigator.clipboard.writeText(document.getElementById('noteBody').value);}
+function updateInfo(note){
+  const words=note.body.trim().split(/\s+/).filter(w=>w).length;
+  document.getElementById('noteInfo').textContent=`${words} words · Updated: ${note.updated}`;
+}
+function renderList(){
+  const q=document.getElementById('searchNotes').value.toLowerCase();
+  const filtered=notes.filter(n=>n.title.toLowerCase().includes(q)||n.body.toLowerCase().includes(q));
+  document.getElementById('notesList').innerHTML=filtered.length?filtered.map(n=>`
+    <div class="note-item${n.id===activeId?' active':''}" onclick="setActive(${n.id})">
+      <h4>${n.title}</h4>
+      <p>${n.body.slice(0,50)||'No content'}</p>
+      <div class="time">${n.updated}</div>
+    </div>
+  `).join(''):'<p style="text-align:center;color:var(--muted);font-size:13px;padding:20px">No notes found</p>';
+}
+function save(){localStorage.setItem('dcNotes',JSON.stringify(notes));}
+renderList();
+if(notes.length>0)setActive(notes[0].id);
+</script>
+</body>
+</html>

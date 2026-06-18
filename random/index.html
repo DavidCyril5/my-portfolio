@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Generator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.gen-tabs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:24px}
+.gen-tab{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .2s}
+.gen-tab:hover,.gen-tab.active{background:rgba(255,215,0,.1);border-color:var(--accent);color:var(--accent)}
+.gen-tab i{display:block;font-size:18px;margin-bottom:4px}
+.big-result{background:var(--bg2);border-radius:14px;padding:28px;text-align:center;margin:20px 0;min-height:100px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;border:2px solid transparent;word-break:break-all}
+.big-result:hover{border-color:rgba(255,215,0,.3)}
+.big-result .output{font-size:32px;font-weight:800;color:var(--accent);font-family:monospace}
+.history-item{background:var(--card2);border-radius:8px;padding:10px 14px;margin-bottom:6px;font-size:14px;font-family:monospace;display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#6a11cb,#2575fc)"><i class="fa fa-shuffle" style="color:#fff"></i></div>
+      <h1>Random Generator</h1>
+      <p>Generate random numbers, passwords, names, colors and more</p>
+    </div>
+
+    <div style="max-width:620px;margin:0 auto 40px">
+      <div class="card">
+        <div class="gen-tabs">
+          <div class="gen-tab active" onclick="setGen('number',this)"><i class="fa fa-hashtag"></i>Number</div>
+          <div class="gen-tab" onclick="setGen('dice',this)"><i class="fa fa-dice"></i>Dice</div>
+          <div class="gen-tab" onclick="setGen('coin',this)"><i class="fa fa-coins"></i>Coin</div>
+          <div class="gen-tab" onclick="setGen('password',this)"><i class="fa fa-key"></i>Password</div>
+          <div class="gen-tab" onclick="setGen('color',this)"><i class="fa fa-palette"></i>Color</div>
+          <div class="gen-tab" onclick="setGen('name',this)"><i class="fa fa-user"></i>Name</div>
+          <div class="gen-tab" onclick="setGen('pick',this)"><i class="fa fa-list"></i>Pick</div>
+          <div class="gen-tab" onclick="setGen('uuid',this)"><i class="fa fa-fingerprint"></i>UUID</div>
+        </div>
+
+        <div id="options"></div>
+
+        <div class="big-result" id="bigResult" onclick="generate()">
+          <div class="output" id="output" style="color:var(--muted);font-size:16px">Click generate below</div>
+        </div>
+
+        <button class="btn btn-primary btn-full" onclick="generate()"><i class="fa fa-shuffle"></i> Generate</button>
+
+        <div id="historySection" style="margin-top:20px;display:none">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:8px">Recent results:</p>
+          <div id="history"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let gen='number',history=[];
+const opts={
+  number:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Min</label><input id="min" class="input-field" type="number" value="1"></div><div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Max</label><input id="max" class="input-field" type="number" value="100"></div></div>`,
+  dice:`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${[4,6,8,10,12,20,100].map(n=>`<div class="gen-tab" id="d${n}" onclick="selectDice(${n},this)">d${n}</div>`).join('')}</div>`,
+  coin:``,
+  password:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"><div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Length: <span id="pwLenVal">16</span></label><input type="range" id="pwLen" min="6" max="64" value="16" oninput="document.getElementById('pwLenVal').textContent=this.value" style="width:100%;accent-color:var(--accent)"></div><div></div></div><div style="display:flex;gap:12px;flex-wrap:wrap"><label style="font-size:13px;color:var(--muted)"><input type="checkbox" id="pwLower" checked> abc</label><label style="font-size:13px;color:var(--muted)"><input type="checkbox" id="pwUpper" checked> ABC</label><label style="font-size:13px;color:var(--muted)"><input type="checkbox" id="pwNum" checked> 123</label><label style="font-size:13px;color:var(--muted)"><input type="checkbox" id="pwSym"> !@#</label></div>`,
+  color:``,
+  name:`<div style="display:flex;gap:8px;flex-wrap:wrap">${['Any','Male','Female'].map(g=>`<div class="gen-tab" id="gender${g}" onclick="selectGender('${g}',this)">${g}</div>`).join('')}</div>`,
+  pick:`<label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px">Enter items (comma separated)</label><textarea id="pickItems" class="input-field" rows="3" placeholder="Apple, Banana, Cherry, Mango...">Rock, Paper, Scissors</textarea>`,
+  uuid:``
+};
+const names={any:['Liam','Emma','Noah','Olivia','Aiden','Sophia','Lucas','Mia','Ethan','Ava','David','Grace','James','Lily','Oliver'],male:['Liam','Noah','Aiden','Lucas','Ethan','David','James','Oliver','Henry','Leo'],female:['Emma','Olivia','Sophia','Mia','Ava','Grace','Lily','Amelia','Ella','Isabella']};
+let selectedDice=6,selectedGender='Any';
+function setGen(g,el){gen=g;document.querySelectorAll('.gen-tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');document.getElementById('options').innerHTML=opts[g]||'';if(g==='dice')setTimeout(()=>selectDice(6,document.getElementById('d6')),0);if(g==='name')setTimeout(()=>selectGender('Any',document.getElementById('genderAny')),0);document.getElementById('output').textContent='Click generate below';document.getElementById('output').style.color='var(--muted)';document.getElementById('output').style.fontSize='16px';}
+function selectDice(n,el){selectedDice=n;document.querySelectorAll('[id^=d]').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function selectGender(g,el){selectedGender=g;document.querySelectorAll('[id^=gender]').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function generate(){
+  let result='';
+  if(gen==='number'){const min=+document.getElementById('min').value,max=+document.getElementById('max').value;result=String(Math.floor(Math.random()*(max-min+1))+min);}
+  else if(gen==='dice'){result='🎲 '+String(Math.floor(Math.random()*selectedDice)+1);}
+  else if(gen==='coin'){result=Math.random()<.5?'🪙 Heads':'🪙 Tails';}
+  else if(gen==='password'){
+    let chars='';
+    if(document.getElementById('pwLower').checked)chars+='abcdefghijklmnopqrstuvwxyz';
+    if(document.getElementById('pwUpper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if(document.getElementById('pwNum').checked)chars+='0123456789';
+    if(document.getElementById('pwSym').checked)chars+='!@#$%^&*()_+-=[]{}|;:,.<>?';
+    if(!chars)chars='abcdefghijklmnopqrstuvwxyz';
+    const len=+document.getElementById('pwLen').value;
+    result=Array.from({length:len},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  }
+  else if(gen==='color'){const c='#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');document.getElementById('bigResult').style.background=c;result=c;}
+  else if(gen==='name'){const g=selectedGender.toLowerCase();const pool=names[g]||names.any;result=pool[Math.floor(Math.random()*pool.length)];}
+  else if(gen==='pick'){const items=document.getElementById('pickItems').value.split(',').map(s=>s.trim()).filter(s=>s);result=items.length?items[Math.floor(Math.random()*items.length)]:'Add some items!';}
+  else if(gen==='uuid'){result=[8,4,4,4,12].map(n=>Array.from({length:n},()=>Math.floor(Math.random()*16).toString(16)).join('')).join('-');}
+  const el=document.getElementById('output');
+  el.textContent=result;el.style.color='var(--accent)';el.style.fontSize=result.length>20?'18px':'32px';
+  history.unshift(result);if(history.length>5)history.pop();
+  document.getElementById('historySection').style.display='block';
+  document.getElementById('history').innerHTML=history.map(r=>`<div class="history-item"><span>${r}</span><i class="fa fa-copy" style="cursor:pointer;color:var(--accent)" onclick="navigator.clipboard.writeText('${r}')"></i></div>`).join('');
+}
+document.getElementById('options').innerHTML=opts.number;
+</script>
+</body>
+</html>

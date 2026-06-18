@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Age Calculator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#f7971e,#ffd200)"><i class="fa fa-birthday-cake" style="color:#fff"></i></div>
+      <h1>Age Calculator</h1>
+      <p>Calculate your exact age in years, months, days, hours and more</p>
+    </div>
+
+    <div style="max-width:520px;margin:0 auto 40px">
+      <div class="card">
+        <div class="form-group" style="margin-bottom:20px">
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px">Your Date of Birth</label>
+          <input id="dob" class="input-field" type="date" onchange="calc()" style="color-scheme:dark">
+        </div>
+        <div class="form-group" style="margin-bottom:20px">
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px">Calculate age as of</label>
+          <input id="target" class="input-field" type="date" onchange="calc()" style="color-scheme:dark">
+        </div>
+
+        <div id="result" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px">
+            <div class="stat" style="background:var(--bg2)"><div class="num" id="years"></div><div class="lbl">Years</div></div>
+            <div class="stat" style="background:var(--bg2)"><div class="num" id="months"></div><div class="lbl">Months</div></div>
+            <div class="stat" style="background:var(--bg2)"><div class="num" id="days"></div><div class="lbl">Days</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">
+            <div class="stat" style="background:var(--bg2)"><div class="num" style="font-size:20px" id="totalDays"></div><div class="lbl">Total Days</div></div>
+            <div class="stat" style="background:var(--bg2)"><div class="num" style="font-size:20px" id="totalWeeks"></div><div class="lbl">Total Weeks</div></div>
+          </div>
+          <div class="msg-info" style="margin-top:16px;text-align:center" id="nextBday"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const today=new Date();
+document.getElementById('target').valueAsDate=today;
+function calc(){
+  const dob=new Date(document.getElementById('dob').value);
+  const tgt=new Date(document.getElementById('target').value);
+  if(!dob||isNaN(dob)||!tgt||isNaN(tgt))return;
+  let y=tgt.getFullYear()-dob.getFullYear();
+  let m=tgt.getMonth()-dob.getMonth();
+  let d=tgt.getDate()-dob.getDate();
+  if(d<0){m--;const prev=new Date(tgt.getFullYear(),tgt.getMonth(),0);d+=prev.getDate();}
+  if(m<0){y--;m+=12;}
+  const totalDays=Math.floor((tgt-dob)/(1000*60*60*24));
+  document.getElementById('years').textContent=y;
+  document.getElementById('months').textContent=m;
+  document.getElementById('days').textContent=d;
+  document.getElementById('totalDays').textContent=totalDays.toLocaleString();
+  document.getElementById('totalWeeks').textContent=Math.floor(totalDays/7).toLocaleString();
+  const nextBday=new Date(tgt.getFullYear(),dob.getMonth(),dob.getDate());
+  if(nextBday<tgt)nextBday.setFullYear(tgt.getFullYear()+1);
+  const daysLeft=Math.floor((nextBday-tgt)/(1000*60*60*24));
+  document.getElementById('nextBday').textContent=daysLeft===0?'🎉 Happy Birthday! Today is your birthday!':'🎂 Your next birthday is in '+daysLeft+' days';
+  document.getElementById('result').style.display='block';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Counter | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#667eea,#764ba2)"><i class="fa fa-align-left" style="color:#fff"></i></div>
+      <h1>Word Counter</h1>
+      <p>Count words, characters, sentences and estimate reading time</p>
+    </div>
+
+    <div style="max-width:720px;margin:0 auto 40px">
+      <div class="card">
+        <textarea id="textArea" class="input-field" rows="12" placeholder="Type or paste your text here..." oninput="analyze()" style="min-height:220px;font-size:15px;line-height:1.7"></textarea>
+
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px" id="statsGrid">
+          <div class="stat"><div class="num" id="words">0</div><div class="lbl">Words</div></div>
+          <div class="stat"><div class="num" id="chars">0</div><div class="lbl">Characters</div></div>
+          <div class="stat"><div class="num" id="noSpace">0</div><div class="lbl">No Spaces</div></div>
+          <div class="stat"><div class="num" id="sentences">0</div><div class="lbl">Sentences</div></div>
+          <div class="stat"><div class="num" id="readTime">0</div><div class="lbl">Min Read</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+          <div style="background:var(--bg2);border-radius:12px;padding:16px">
+            <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Top 5 most used words:</p>
+            <div id="topWords" style="font-size:13px;color:var(--text)"></div>
+          </div>
+          <div style="background:var(--bg2);border-radius:12px;padding:16px">
+            <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Text analysis:</p>
+            <div id="analysis" style="font-size:13px;color:var(--muted)"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="clearText()"><i class="fa fa-trash"></i> Clear</button>
+          <button class="btn btn-secondary btn-sm" onclick="copyText()"><i class="fa fa-copy"></i> Copy</button>
+          <button class="btn btn-secondary btn-sm" onclick="upper()"><i class="fa fa-font"></i> UPPER</button>
+          <button class="btn btn-secondary btn-sm" onclick="lower()"><i class="fa fa-font"></i> lower</button>
+          <button class="btn btn-secondary btn-sm" onclick="titleCase()"><i class="fa fa-font"></i> Title Case</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const stopWords=new Set(['the','and','a','an','in','is','it','of','to','that','was','for','on','are','as','with','at','be','by','from','or','but','not','this','have','had','has','been','will','do','did','can','could','we','you','he','she','they','i','me','my','your','his','her','our','its','we','all','if','so','up','out','no','when','what','there','about','their','would','more','some','into','than','then','any','its','also','how','which','his']);
+function analyze(){
+  const t=document.getElementById('textArea').value;
+  const wordList=t.trim().split(/\s+/).filter(w=>w.length>0);
+  const words=t.trim()===''?0:wordList.length;
+  const chars=t.length;
+  const noSpace=t.replace(/\s/g,'').length;
+  const sentences=t.split(/[.!?]+/).filter(s=>s.trim().length>0).length;
+  const readTime=Math.ceil(words/200);
+  document.getElementById('words').textContent=words.toLocaleString();
+  document.getElementById('chars').textContent=chars.toLocaleString();
+  document.getElementById('noSpace').textContent=noSpace.toLocaleString();
+  document.getElementById('sentences').textContent=sentences;
+  document.getElementById('readTime').textContent=readTime||0;
+  if(words>0){
+    const freq={};
+    wordList.forEach(w=>{const lw=w.toLowerCase().replace(/[^a-z]/g,'');if(lw&&!stopWords.has(lw))freq[lw]=(freq[lw]||0)+1;});
+    const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    document.getElementById('topWords').innerHTML=top.map(([w,c])=>`<div style="display:flex;justify-content:space-between"><span>${w}</span><span style="color:var(--accent)">${c}×</span></div>`).join('');
+    const avgWl=wordList.reduce((a,w)=>a+w.length,0)/words;
+    const para=t.split(/\n\n+/).filter(p=>p.trim()).length;
+    document.getElementById('analysis').innerHTML=`Avg word length: ${avgWl.toFixed(1)}<br>Paragraphs: ${para}<br>Unique words: ${Object.keys(freq).length}`;
+  } else {document.getElementById('topWords').textContent='—';document.getElementById('analysis').textContent='—';}
+}
+function clearText(){document.getElementById('textArea').value='';analyze();}
+function copyText(){navigator.clipboard.writeText(document.getElementById('textArea').value);}
+function upper(){const t=document.getElementById('textArea');t.value=t.value.toUpperCase();analyze();}
+function lower(){const t=document.getElementById('textArea');t.value=t.value.toLowerCase();analyze();}
+function titleCase(){const t=document.getElementById('textArea');t.value=t.value.replace(/\w\S*/g,tx=>tx.charAt(0).toUpperCase()+tx.substr(1).toLowerCase());analyze();}
+</script>
+</body>
+</html>

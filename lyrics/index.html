@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyrics Finder | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.lyrics-box{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:28px;font-size:15px;line-height:2;white-space:pre-wrap;color:var(--text);max-height:520px;overflow-y:auto;margin-top:20px}
+.song-info{display:flex;gap:20px;align-items:center;padding:20px;background:var(--bg2);border-radius:14px;margin-bottom:4px}
+.song-thumb{width:80px;height:80px;border-radius:12px;object-fit:cover;flex-shrink:0}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c)"><i class="fa fa-music" style="color:#fff"></i></div>
+      <h1>Lyrics Finder</h1>
+      <p>Find lyrics for any song — search by title and artist</p>
+    </div>
+
+    <div style="max-width:680px;margin:0 auto 40px">
+      <div class="grid-2" style="margin-bottom:12px">
+        <input id="titleInput" class="input-field" type="text" placeholder="Song title..." style="margin-bottom:0" onkeypress="if(event.key==='Enter')search()">
+        <input id="artistInput" class="input-field" type="text" placeholder="Artist name..." style="margin-bottom:0" onkeypress="if(event.key==='Enter')search()">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="search()"><i class="fa fa-search"></i> Find Lyrics</button>
+
+      <div id="loader" class="loader hidden"><div class="spinner"></div> Finding lyrics...</div>
+      <div id="errorMsg" class="msg-error hidden"></div>
+
+      <div id="result" class="hidden">
+        <div class="song-info">
+          <img id="thumb" class="song-thumb" alt="" style="display:none">
+          <div>
+            <h3 id="songTitle" style="font-size:18px;font-weight:700;margin-bottom:4px"></h3>
+            <p id="songArtist" style="color:var(--muted);font-size:14px"></p>
+          </div>
+        </div>
+        <div class="lyrics-box" id="lyricsBox"></div>
+        <div style="margin-top:12px;display:flex;gap:10px">
+          <button class="btn btn-secondary btn-sm" onclick="copyLyrics()"><i class="fa fa-copy"></i> Copy Lyrics</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+async function search(){
+  const t=document.getElementById('titleInput').value.trim();
+  const a=document.getElementById('artistInput').value.trim();
+  if(!t){showError('Please enter a song title');return;}
+  show('loader');hide('errorMsg');hide('result');
+  try{
+    const r=await fetch(`${API}/lyrics?t=${encodeURIComponent(t)}&a=${encodeURIComponent(a||t)}`);
+    const d=await r.json();
+    if(d.lyrics){
+      document.getElementById('songTitle').textContent=d.title||t;
+      document.getElementById('songArtist').textContent=d.artist||a||'';
+      if(d.thumbnail){document.getElementById('thumb').src=d.thumbnail;document.getElementById('thumb').style.display='block';}
+      document.getElementById('lyricsBox').textContent=d.lyrics;
+      show('result');
+    } else {showError(d.error||'Lyrics not found. Try a different song or artist.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+function copyLyrics(){
+  navigator.clipboard.writeText(document.getElementById('lyricsBox').textContent);
+  alert('Lyrics copied to clipboard!');
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

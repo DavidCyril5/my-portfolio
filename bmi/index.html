@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI Calculator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.bmi-gauge{width:200px;height:100px;border-radius:100px 100px 0 0;background:conic-gradient(from 180deg,#2ed573 0deg,#ffd200 72deg,#ffa502 108deg,#ff4757 144deg,#cc0000 180deg);margin:24px auto 8px;position:relative;overflow:hidden}
+.bmi-gauge::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:140px;height:70px;background:var(--card);border-radius:70px 70px 0 0}
+.bmi-needle{position:absolute;bottom:0;left:50%;width:3px;height:85px;background:var(--text);border-radius:3px;transform-origin:bottom center;transition:transform .5s cubic-bezier(.4,2,.6,1)}
+.bmi-value{text-align:center;font-size:48px;font-weight:800;margin:16px 0 4px}
+.bmi-category{text-align:center;font-size:16px;font-weight:600;margin-bottom:24px}
+.ranges{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+.range-item{background:var(--card2);border-radius:10px;padding:12px;text-align:center}
+.range-item .r{font-size:12px;font-weight:600;margin-bottom:4px}
+.range-item .n{font-size:13px;color:var(--muted)}
+.unit-tabs{display:flex;background:var(--card2);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.unit-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);transition:all .2s}
+.unit-tab.active{background:var(--accent);color:#000}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#11998e,#38ef7d)"><i class="fa fa-weight-scale" style="color:#fff"></i></div>
+      <h1>BMI Calculator</h1>
+      <p>Calculate your Body Mass Index and understand what it means</p>
+    </div>
+
+    <div style="max-width:560px;margin:0 auto 40px">
+      <div class="card">
+        <div class="unit-tabs">
+          <div class="unit-tab active" id="metricTab" onclick="setUnit('metric')">Metric (kg/cm)</div>
+          <div class="unit-tab" id="imperialTab" onclick="setUnit('imperial')">Imperial (lb/in)</div>
+        </div>
+
+        <div id="metricFields">
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Weight (kg)</label>
+          <input class="input-field" id="weightKg" type="number" placeholder="e.g. 70" min="1" max="500" oninput="calc()">
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Height (cm)</label>
+          <input class="input-field" id="heightCm" type="number" placeholder="e.g. 175" min="50" max="300" oninput="calc()">
+        </div>
+        <div id="imperialFields" style="display:none">
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Weight (lbs)</label>
+          <input class="input-field" id="weightLb" type="number" placeholder="e.g. 154" oninput="calc()">
+          <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Height (inches)</label>
+          <input class="input-field" id="heightIn" type="number" placeholder="e.g. 69" oninput="calc()">
+        </div>
+
+        <div id="result" style="display:none">
+          <div class="bmi-gauge"><div class="bmi-needle" id="needle"></div></div>
+          <div class="bmi-value" id="bmiVal"></div>
+          <div class="bmi-category" id="bmiCat"></div>
+          <p id="bmiMsg" style="color:var(--muted);font-size:14px;text-align:center;margin-bottom:12px"></p>
+          <div class="ranges">
+            <div class="range-item"><div class="r" style="color:#2ed573">Underweight</div><div class="n">< 18.5</div></div>
+            <div class="range-item"><div class="r" style="color:#ffd200">Normal</div><div class="n">18.5–24.9</div></div>
+            <div class="range-item"><div class="r" style="color:#ffa502">Overweight</div><div class="n">25–29.9</div></div>
+            <div class="range-item"><div class="r" style="color:#ff4757">Obese</div><div class="n">≥ 30</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let unit='metric';
+function setUnit(u){unit=u;
+  document.getElementById('metricFields').style.display=u==='metric'?'block':'none';
+  document.getElementById('imperialFields').style.display=u==='imperial'?'block':'none';
+  document.getElementById('metricTab').classList.toggle('active',u==='metric');
+  document.getElementById('imperialTab').classList.toggle('active',u==='imperial');
+  calc();
+}
+function calc(){
+  let kg,h;
+  if(unit==='metric'){kg=parseFloat(document.getElementById('weightKg').value);h=parseFloat(document.getElementById('heightCm').value)/100;}
+  else{kg=parseFloat(document.getElementById('weightLb').value)*0.453592;h=parseFloat(document.getElementById('heightIn').value)*0.0254;}
+  if(!kg||!h||kg<=0||h<=0)return;
+  const bmi=kg/(h*h);
+  const b=bmi.toFixed(1);
+  let cat,color,msg,angle;
+  if(bmi<18.5){cat='Underweight';color='#2ed573';msg='You are underweight. Consider a balanced diet.';angle=-70;}
+  else if(bmi<25){cat='Normal Weight';color='#ffd200';msg='Great! You have a healthy weight.';angle=-20;}
+  else if(bmi<30){cat='Overweight';color='#ffa502';msg='You are overweight. Regular exercise helps.';angle=20;}
+  else{cat='Obese';color='#ff4757';msg='You are obese. Consult a healthcare professional.';angle=70;}
+  document.getElementById('bmiVal').textContent=b;
+  document.getElementById('bmiVal').style.color=color;
+  document.getElementById('bmiCat').textContent=cat;
+  document.getElementById('bmiCat').style.color=color;
+  document.getElementById('bmiMsg').textContent=msg;
+  document.getElementById('needle').style.transform=`translateX(-50%) rotate(${angle}deg)`;
+  document.getElementById('result').style.display='block';
+}
+</script>
+</body>
+</html>

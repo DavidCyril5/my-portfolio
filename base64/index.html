@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base64 Encoder | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.tabs{display:flex;background:var(--card2);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.tab{flex:1;padding:12px;text-align:center;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);transition:all .2s}
+.tab.active{background:var(--accent);color:#000}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#4facfe,#00f2fe)"><i class="fa fa-code" style="color:#fff"></i></div>
+      <h1>Base64 Encoder / Decoder</h1>
+      <p>Encode text to Base64 or decode Base64 back to text</p>
+    </div>
+
+    <div style="max-width:720px;margin:0 auto 40px">
+      <div class="card">
+        <div class="tabs">
+          <div class="tab active" id="encTab" onclick="setMode('encode')"><i class="fa fa-lock"></i> Encode</div>
+          <div class="tab" id="decTab" onclick="setMode('decode')"><i class="fa fa-lock-open"></i> Decode</div>
+        </div>
+
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px" id="inputLabel">Input Text</label>
+        <textarea id="inputText" class="input-field" rows="6" placeholder="Enter text to encode..." oninput="convert()" style="min-height:140px;font-family:monospace"></textarea>
+
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <button class="btn btn-primary btn-sm" onclick="convert()"><i class="fa fa-play"></i> Convert</button>
+          <button class="btn btn-secondary btn-sm" onclick="swap()"><i class="fa fa-exchange-alt"></i> Swap</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearAll()"><i class="fa fa-trash"></i> Clear</button>
+        </div>
+
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px" id="outputLabel">Base64 Output</label>
+        <div style="position:relative">
+          <textarea id="outputText" class="input-field" rows="6" placeholder="Output will appear here..." readonly style="min-height:140px;font-family:monospace;padding-right:80px"></textarea>
+          <button onclick="copyOutput()" class="copy-btn" style="position:absolute;top:12px;right:12px"><i class="fa fa-copy"></i> Copy</button>
+        </div>
+        <div id="errorMsg" class="msg-error hidden"></div>
+        <div style="display:flex;gap:16px;margin-top:12px">
+          <span style="font-size:13px;color:var(--muted)">Input: <span id="inputLen">0</span> chars</span>
+          <span style="font-size:13px;color:var(--muted)">Output: <span id="outputLen">0</span> chars</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let mode='encode';
+function setMode(m){
+  mode=m;
+  document.getElementById('encTab').classList.toggle('active',m==='encode');
+  document.getElementById('decTab').classList.toggle('active',m==='decode');
+  document.getElementById('inputLabel').textContent=m==='encode'?'Input Text':'Base64 Input';
+  document.getElementById('outputLabel').textContent=m==='encode'?'Base64 Output':'Decoded Text';
+  document.getElementById('inputText').placeholder=m==='encode'?'Enter text to encode...':'Enter Base64 to decode...';
+  convert();
+}
+function convert(){
+  const inp=document.getElementById('inputText').value;
+  hide('errorMsg');
+  try{
+    let out;
+    if(mode==='encode')out=btoa(unescape(encodeURIComponent(inp)));
+    else out=decodeURIComponent(escape(atob(inp)));
+    document.getElementById('outputText').value=out;
+    document.getElementById('inputLen').textContent=inp.length;
+    document.getElementById('outputLen').textContent=out.length;
+  } catch(e){
+    document.getElementById('outputText').value='';
+    if(inp)showError('Invalid Base64 input. Please check your input.');
+  }
+}
+function swap(){
+  const inp=document.getElementById('inputText').value;
+  const out=document.getElementById('outputText').value;
+  document.getElementById('inputText').value=out;
+  document.getElementById('outputText').value=inp;
+  mode=mode==='encode'?'decode':'encode';
+  setMode(mode);
+}
+function clearAll(){document.getElementById('inputText').value='';document.getElementById('outputText').value='';document.getElementById('inputLen').textContent='0';document.getElementById('outputLen').textContent='0';}
+function copyOutput(){navigator.clipboard.writeText(document.getElementById('outputText').value);}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

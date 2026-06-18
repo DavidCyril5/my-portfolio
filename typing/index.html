@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Speed Test | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.typing-text{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:24px;font-size:20px;line-height:1.9;font-family:'Courier New',monospace;margin-bottom:20px;letter-spacing:.5px;user-select:none;cursor:default}
+.typing-text .correct{color:var(--success)}
+.typing-text .wrong{color:var(--danger);background:rgba(255,71,87,.2);border-radius:3px}
+.typing-text .cursor{border-left:2px solid var(--accent);animation:blink .6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#typingInput{position:absolute;opacity:0;pointer-events:none}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.typing-stat{background:var(--bg2);border-radius:12px;padding:16px;text-align:center}
+.typing-stat .val{font-size:28px;font-weight:800;color:var(--accent)}
+.typing-stat .lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.result-panel{background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.05));border:1px solid rgba(255,215,0,.3);border-radius:16px;padding:32px;text-align:center;display:none}
+.wpm-big{font-size:80px;font-weight:900;color:var(--accent);line-height:1}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#0f0c29,#302b63)"><i class="fa fa-keyboard" style="color:var(--accent)"></i></div>
+      <h1>Typing Speed Test</h1>
+      <p>Test and improve your typing speed in words per minute</p>
+    </div>
+
+    <div style="max-width:760px;margin:0 auto 40px">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="setDuration(30)" id="dur30" style="opacity:1">30s</button>
+            <button class="btn btn-secondary btn-sm" onclick="setDuration(60)" id="dur60">60s</button>
+            <button class="btn btn-secondary btn-sm" onclick="setDuration(120)" id="dur120">2min</button>
+          </div>
+          <div style="font-size:32px;font-weight:800;font-family:monospace;color:var(--accent)" id="timerDisplay">30</div>
+          <button class="btn btn-primary btn-sm" onclick="restart()"><i class="fa fa-redo"></i> Restart</button>
+        </div>
+
+        <div class="typing-text" id="typingText" onclick="focus()"></div>
+        <input id="typingInput" type="text" oninput="onInput(event)">
+
+        <div style="text-align:center;color:var(--muted);font-size:14px" id="hint"><i class="fa fa-info-circle" style="margin-right:6px"></i>Click on the text area above and start typing</div>
+
+        <div class="stats-grid" id="statsGrid">
+          <div class="typing-stat"><div class="val" id="wpmLive">0</div><div class="lbl">WPM</div></div>
+          <div class="typing-stat"><div class="val" id="accLive">100%</div><div class="lbl">Accuracy</div></div>
+          <div class="typing-stat"><div class="val" id="correctChars">0</div><div class="lbl">Correct</div></div>
+          <div class="typing-stat"><div class="val" id="wrongChars">0</div><div class="lbl">Errors</div></div>
+        </div>
+
+        <div class="result-panel" id="resultPanel">
+          <p style="font-size:14px;color:var(--muted);margin-bottom:8px">Your Speed</p>
+          <div class="wpm-big" id="finalWpm">0</div>
+          <p style="font-size:18px;color:var(--muted);margin-bottom:24px">WPM</p>
+          <div style="display:flex;gap:20px;justify-content:center">
+            <span>Accuracy: <strong id="finalAcc" style="color:var(--accent)">0%</strong></span>
+            <span>Errors: <strong id="finalErrors" style="color:var(--danger)">0</strong></span>
+          </div>
+          <button class="btn btn-primary" style="margin-top:24px" onclick="restart()"><i class="fa fa-redo"></i> Try Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const sentences=["The quick brown fox jumps over the lazy dog and runs away into the forest","JavaScript is a versatile programming language used for web development","Practice typing every day to improve your speed and accuracy significantly","The best way to predict the future is to invent it yourself","In the middle of difficulty lies opportunity for those who persevere","Success is not final failure is not fatal it is the courage to continue","Every great developer you know got there by solving problems they were unqualified to solve","Code is like humor when you have to explain it it is not that good","Programming is the art of telling another human what one wants the computer to do","The computer was born to solve problems that did not exist before it came along"];
+
+let words=[],currentIndex=0,correctCount=0,wrongCount=0,started=false,finished=false,timer=null,duration=30,timeLeft=30;
+
+function setDuration(d){duration=d;document.querySelectorAll('[id^=dur]').forEach(b=>b.style.opacity='.5');document.getElementById('dur'+d).style.opacity='1';restart();}
+function shuffle(){const t=sentences[Math.floor(Math.random()*sentences.length)];words=t.split(' ');}
+function restart(){
+  clearInterval(timer);started=false;finished=false;currentIndex=0;correctCount=0;wrongCount=0;timeLeft=duration;
+  document.getElementById('typingInput').value='';
+  document.getElementById('timerDisplay').textContent=timeLeft;
+  document.getElementById('wpmLive').textContent='0';document.getElementById('accLive').textContent='100%';
+  document.getElementById('correctChars').textContent='0';document.getElementById('wrongChars').textContent='0';
+  document.getElementById('resultPanel').style.display='none';
+  document.getElementById('statsGrid').style.display='grid';
+  document.getElementById('hint').textContent='Click on the text area above and start typing';
+  shuffle();renderText();
+}
+function renderText(typedWord='',wrong=false){
+  const el=document.getElementById('typingText');
+  el.innerHTML=words.map((w,i)=>{
+    if(i<currentIndex)return`<span class="correct">${w} </span>`;
+    if(i===currentIndex){
+      let html='';
+      for(let j=0;j<Math.max(w.length,typedWord.length);j++){
+        if(j>=typedWord.length){if(j===typedWord.length&&j===0)html+=`<span class="cursor"> </span>`;html+=w[j]||'';}
+        else if(j<w.length&&typedWord[j]===w[j])html+=`<span class="correct">${w[j]}</span>`;
+        else if(j<w.length)html+=`<span class="wrong">${w[j]}</span>`;
+        else html+=`<span class="wrong">${typedWord[j]}</span>`;
+      }
+      return`<span>${html}</span> `;
+    }
+    return`<span style="color:var(--muted)">${w} </span>`;
+  }).join('');
+}
+function onInput(e){
+  if(finished)return;
+  const val=document.getElementById('typingInput').value;
+  if(!started){started=true;document.getElementById('hint').textContent='';timer=setInterval(tick,1000);}
+  if(val.endsWith(' ')){
+    const typed=val.trim();
+    if(typed===words[currentIndex]){correctCount++;}
+    else{wrongCount++;}
+    currentIndex++;
+    document.getElementById('typingInput').value='';
+    document.getElementById('correctChars').textContent=correctCount;
+    document.getElementById('wrongChars').textContent=wrongCount;
+    const total=correctCount+wrongCount;
+    document.getElementById('accLive').textContent=total?Math.round(correctCount/total*100)+'%':'100%';
+    const elapsed=(duration-timeLeft)||1;
+    document.getElementById('wpmLive').textContent=Math.round((correctCount/elapsed)*60);
+    if(currentIndex>=words.length){clearInterval(timer);finish();}
+    else renderText('',false);
+  } else renderText(val);
+}
+function tick(){
+  timeLeft--;document.getElementById('timerDisplay').textContent=timeLeft;
+  if(timeLeft<=0){clearInterval(timer);finish();}
+}
+function finish(){
+  finished=true;
+  const wpm=Math.round((correctCount/duration)*60);
+  const total=correctCount+wrongCount;
+  const acc=total?Math.round(correctCount/total*100):100;
+  document.getElementById('finalWpm').textContent=wpm;
+  document.getElementById('finalAcc').textContent=acc+'%';
+  document.getElementById('finalErrors').textContent=wrongCount;
+  document.getElementById('statsGrid').style.display='none';
+  document.getElementById('resultPanel').style.display='block';
+}
+function focus(){document.getElementById('typingText').onclick=()=>document.getElementById('typingInput').focus();document.getElementById('typingInput').focus();}
+document.getElementById('typingText').addEventListener('click',()=>document.getElementById('typingInput').focus());
+restart();
+</script>
+</body>
+</html>

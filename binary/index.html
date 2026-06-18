@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Base Converter | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.base-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.base-box{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .2s}
+.base-box:focus-within{border-color:var(--accent)}
+.base-box label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px}
+.base-box input{background:none;border:none;color:var(--text);font-size:15px;font-family:monospace;width:100%;outline:none;font-weight:600}
+.copy-val{float:right;color:var(--accent);cursor:pointer;font-size:12px}
+.bit-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:16px}
+.bit{background:var(--card2);border:1px solid var(--border);border-radius:8px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;font-family:monospace}
+.bit.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.bit:hover{border-color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#0f2027,#2c5364)"><i class="fa fa-microchip" style="color:var(--accent)"></i></div>
+      <h1>Number Base Converter</h1>
+      <p>Convert between binary, octal, decimal and hexadecimal</p>
+    </div>
+
+    <div style="max-width:600px;margin:0 auto 40px">
+      <div class="card">
+        <div class="base-grid">
+          <div class="base-box">
+            <label>Binary (Base 2) <span class="copy-val" onclick="copy('bin')">Copy</span></label>
+            <input id="bin" placeholder="1010..." oninput="convert('bin',this.value,2)" maxlength="32">
+          </div>
+          <div class="base-box">
+            <label>Octal (Base 8) <span class="copy-val" onclick="copy('oct')">Copy</span></label>
+            <input id="oct" placeholder="0-7..." oninput="convert('oct',this.value,8)">
+          </div>
+          <div class="base-box">
+            <label>Decimal (Base 10) <span class="copy-val" onclick="copy('dec')">Copy</span></label>
+            <input id="dec" placeholder="0-9..." oninput="convert('dec',this.value,10)">
+          </div>
+          <div class="base-box">
+            <label>Hexadecimal (Base 16) <span class="copy-val" onclick="copy('hex')">Copy</span></label>
+            <input id="hex" placeholder="0-F..." oninput="convert('hex',this.value,16)" style="text-transform:uppercase">
+          </div>
+        </div>
+
+        <div id="asciiBox" style="margin-top:16px;background:var(--card2);border-radius:12px;padding:16px;display:none">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">ASCII Character</label>
+          <span id="asciiChar" style="font-size:20px;font-weight:700;color:var(--accent)"></span>
+        </div>
+
+        <p style="font-size:13px;color:var(--muted);margin:20px 0 10px font-weight:600">8-bit Visualization (click to toggle)</p>
+        <div class="bit-grid" id="bitGrid"></div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px;text-align:center">Decimal value: <span id="bitDecimal" style="color:var(--accent);font-weight:700">0</span></p>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let bits=[0,0,0,0,0,0,0,0];
+function convert(from,val,base){
+  if(!val.trim()){['bin','oct','dec','hex'].forEach(id=>document.getElementById(id).value='');renderBits(0);return;}
+  const n=parseInt(val,base);
+  if(isNaN(n)||n<0)return;
+  const fields={bin:[2,''],oct:[8,''],dec:[10,''],hex:[16,'']};
+  Object.entries(fields).forEach(([id,[b]])=>{if(id!==from)document.getElementById(id).value=n.toString(b).toUpperCase();});
+  renderBits(n&0xFF);
+  const ascii=document.getElementById('asciiBox');
+  if(n>=32&&n<=126){ascii.style.display='block';document.getElementById('asciiChar').textContent=String.fromCharCode(n)+' (ASCII)';}
+  else ascii.style.display='none';
+}
+function renderBits(n){
+  bits=Array.from({length:8},(_,i)=>(n>>(7-i))&1);
+  document.getElementById('bitGrid').innerHTML=bits.map((b,i)=>`<div class="bit${b?' on':''}" onclick="toggleBit(${i})">${b}</div>`).join('');
+  document.getElementById('bitDecimal').textContent=n;
+}
+function toggleBit(i){bits[i]=bits[i]?0:1;const n=bits.reduce((a,b,i)=>a+(b<<(7-i)),0);renderBits(n);['bin','oct','dec','hex'].forEach((id,_,arr)=>document.getElementById(id).value=n.toString([2,8,10,16][arr.indexOf(id)]).toUpperCase());}
+function copy(id){navigator.clipboard.writeText(document.getElementById(id).value);}
+renderBits(0);
+</script>
+</body>
+</html>

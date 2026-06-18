@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallpaper Search | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.wall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:24px}
+.wall-card{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:16/10;cursor:pointer;transition:transform .2s}
+.wall-card:hover{transform:scale(1.02)}
+.wall-card img{width:100%;height:100%;object-fit:cover}
+.wall-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 50%);opacity:0;transition:opacity .2s;display:flex;align-items:flex-end;padding:14px}
+.wall-card:hover .wall-card-overlay{opacity:1}
+.wall-card-info{flex:1}
+.wall-card-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:6px}
+.wall-dl-btn{background:var(--accent);color:#000;border:none;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.wall-dl-btn:hover{transform:translateY(-1px)}
+.load-more-wrap{text-align:center;margin-top:32px}
+.search-row{display:flex;gap:12px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container" style="max-width:1200px">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#4776e6,#8e54e9)"><i class="fa fa-images" style="color:#fff"></i></div>
+      <h1>WallVista</h1>
+      <p>Discover and download beautiful HD wallpapers — for any device</p>
+    </div>
+
+    <div class="search-row">
+      <input id="searchInput" class="input-field" type="text" placeholder="Search wallpapers... (nature, city, anime, cars...)" style="margin:0;flex:1" onkeypress="if(event.key==='Enter')search(1)">
+      <button class="btn btn-primary" onclick="search(1)"><i class="fa fa-search"></i> Search</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('nature')">Nature</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('city')">City</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('anime')">Anime</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('abstract')">Abstract</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('cars')">Cars</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('space')">Space</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('dark')">Dark</button>
+      <button class="btn btn-secondary btn-sm" onclick="quickSearch('minimal')">Minimal</button>
+    </div>
+
+    <div id="loader" class="loader hidden"><div class="spinner"></div> Searching wallpapers...</div>
+    <div id="errorMsg" class="msg-error hidden"></div>
+    <div id="resultsInfo" style="color:var(--muted);font-size:13px;display:none"></div>
+
+    <div class="wall-grid" id="wallGrid"></div>
+    <div class="load-more-wrap hidden" id="loadMoreWrap">
+      <button class="btn btn-secondary" onclick="loadMore()"><i class="fa fa-plus"></i> Load More</button>
+    </div>
+  </div>
+  <footer class="site-footer" style="margin-top:48px">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+let currentQuery='nature',currentPage=1;
+
+function quickSearch(q){document.getElementById('searchInput').value=q;search(1);}
+
+async function search(page=1){
+  const q=document.getElementById('searchInput').value.trim()||'nature';
+  currentQuery=q;currentPage=page;
+  if(page===1){document.getElementById('wallGrid').innerHTML='';document.getElementById('loadMoreWrap').classList.add('hidden');}
+  show('loader');hide('errorMsg');
+  try{
+    const r=await fetch(`${API}/search/wallpaper?text=${encodeURIComponent(q)}&page=${page}`);
+    const d=await r.json();
+    if(d.success&&d.result&&d.result.length>0){
+      renderWalls(d.result);
+      document.getElementById('resultsInfo').textContent=`Showing results for "${q}"`;
+      document.getElementById('resultsInfo').style.display='block';
+      if(d.result.length>=8)document.getElementById('loadMoreWrap').classList.remove('hidden');
+    } else if(page===1){showError('No wallpapers found. Try a different search term.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+
+function renderWalls(items){
+  const grid=document.getElementById('wallGrid');
+  items.forEach(w=>{
+    const div=document.createElement('div');
+    div.className='wall-card';
+    div.innerHTML=`
+      <img src="${w.thumbnail||w.image||w.url||''}" alt="${w.title||''}" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <div class="wall-card-overlay">
+        <div class="wall-card-info">
+          <div class="wall-card-title">${(w.title||'Wallpaper').slice(0,40)}</div>
+          <a href="${w.download||w.source||w.url||'#'}" target="_blank" class="wall-dl-btn" download><i class="fa fa-download"></i> Download</a>
+        </div>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function loadMore(){currentPage++;search(currentPage);}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+
+search(1);
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Formatter | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.editor-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.editor-head{padding:12px 16px;background:var(--card2);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600}
+.editor-body{padding:0}
+.editor-body textarea{width:100%;background:transparent;border:none;padding:16px;color:var(--text);font-size:13px;font-family:'Courier New',monospace;resize:vertical;min-height:380px;outline:none;line-height:1.6}
+.valid-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+.valid{background:rgba(46,213,115,.15);color:var(--success)}
+.invalid{background:rgba(255,71,87,.15);color:var(--danger)}
+@media(max-width:600px){.editor-wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container" style="max-width:1100px">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#43e97b,#38f9d7)"><i class="fa fa-brackets-curly" style="color:#fff"></i></div>
+      <h1>JSON Formatter</h1>
+      <p>Format, validate, minify and explore JSON data easily</p>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-primary btn-sm" onclick="format()"><i class="fa fa-align-left"></i> Format</button>
+      <button class="btn btn-secondary btn-sm" onclick="minify()"><i class="fa fa-compress"></i> Minify</button>
+      <button class="btn btn-secondary btn-sm" onclick="copyOutput()"><i class="fa fa-copy"></i> Copy Output</button>
+      <button class="btn btn-secondary btn-sm" onclick="clearAll()"><i class="fa fa-trash"></i> Clear</button>
+      <button class="btn btn-secondary btn-sm" onclick="loadSample()"><i class="fa fa-file-code"></i> Load Sample</button>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="editor-box">
+        <div class="editor-head">
+          Input JSON
+          <span class="valid-badge" id="validBadge">Waiting...</span>
+        </div>
+        <div class="editor-body">
+          <textarea id="input" placeholder='Paste your JSON here...' oninput="validate()"></textarea>
+        </div>
+      </div>
+      <div class="editor-box">
+        <div class="editor-head">
+          Output
+          <span style="color:var(--muted);font-size:12px" id="outputInfo"></span>
+        </div>
+        <div class="editor-body">
+          <textarea id="output" placeholder="Formatted output will appear here..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+    <div id="errorMsg" class="msg-error hidden" style="margin-top:12px"></div>
+  </div>
+  <footer class="site-footer" style="margin-top:32px">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+function validate(){
+  const inp=document.getElementById('input').value.trim();
+  const badge=document.getElementById('validBadge');
+  if(!inp){badge.className='valid-badge';badge.textContent='Waiting...';return;}
+  try{JSON.parse(inp);badge.className='valid-badge valid';badge.textContent='✓ Valid JSON';}
+  catch(e){badge.className='valid-badge invalid';badge.textContent='✗ Invalid JSON';}
+}
+function format(){
+  hide('errorMsg');
+  try{
+    const parsed=JSON.parse(document.getElementById('input').value);
+    const out=JSON.stringify(parsed,null,2);
+    document.getElementById('output').value=out;
+    document.getElementById('outputInfo').textContent=`${out.split('\n').length} lines`;
+  } catch(e){showError('Invalid JSON: '+e.message);}
+}
+function minify(){
+  hide('errorMsg');
+  try{
+    const parsed=JSON.parse(document.getElementById('input').value);
+    const out=JSON.stringify(parsed);
+    document.getElementById('output').value=out;
+    document.getElementById('outputInfo').textContent=`${out.length} chars`;
+  } catch(e){showError('Invalid JSON: '+e.message);}
+}
+function copyOutput(){navigator.clipboard.writeText(document.getElementById('output').value);}
+function clearAll(){document.getElementById('input').value='';document.getElementById('output').value='';validate();}
+function loadSample(){
+  document.getElementById('input').value=JSON.stringify({"name":"David Cyril","age":19,"location":"Abuja, Nigeria","skills":["JavaScript","Node.js","React","MongoDB"],"projects":{"count":40,"featured":["AI Chatbot","YouTube Downloader","Weather App"]},"contact":{"email":"Davidcyril209@gmail.com","whatsapp":"+2349066528353"}},null,2);
+  validate();format();
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

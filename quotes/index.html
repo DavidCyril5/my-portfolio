@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quote Generator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.quote-card{max-width:680px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:48px 40px;text-align:center;position:relative;overflow:hidden}
+.quote-card::before{content:'\201C';position:absolute;top:-20px;left:20px;font-size:160px;color:rgba(255,215,0,0.06);font-family:Georgia,serif;line-height:1}
+.quote-text{font-size:clamp(18px,3vw,26px);font-weight:500;line-height:1.7;color:var(--text);margin-bottom:24px;position:relative;font-style:italic}
+.quote-author{font-size:16px;color:var(--accent);font-weight:700}
+.quote-author::before{content:'— '}
+.quote-actions{display:flex;justify-content:center;gap:12px;margin-top:32px;flex-wrap:wrap}
+.count{font-size:13px;color:var(--muted);margin-top:16px}
+.category-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px}
+.cat-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s}
+.cat-btn.active{background:rgba(255,215,0,0.1);border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"><i class="fa fa-quote-left" style="color:#fff"></i></div>
+      <h1>Quote Generator</h1>
+      <p>Get inspired with motivational quotes from great minds</p>
+    </div>
+
+    <div id="loader" class="loader"><div class="spinner"></div> Loading quote...</div>
+    <div id="errorMsg" class="msg-error hidden"></div>
+
+    <div id="quoteCard" class="quote-card hidden">
+      <p id="quoteText" class="quote-text"></p>
+      <p id="quoteAuthor" class="quote-author"></p>
+      <div class="quote-actions">
+        <button class="btn btn-primary" onclick="loadQuote()"><i class="fa fa-refresh"></i> New Quote</button>
+        <button class="btn btn-secondary" onclick="copyQuote()"><i class="fa fa-copy"></i> Copy</button>
+        <a id="shareWa" href="#" target="_blank" class="btn btn-green btn-sm"><i class="fab fa-whatsapp"></i> Share</a>
+      </div>
+      <p id="quoteCopied" class="hidden" style="color:var(--success);font-size:13px;margin-top:12px">Copied to clipboard!</p>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+let currentQuote='',currentAuthor='';
+async function loadQuote(){
+  document.getElementById('quoteCard').classList.add('hidden');
+  show('loader');hide('errorMsg');
+  try{
+    const r=await fetch(`${API}/random/quotes`);
+    const d=await r.json();
+    if(d.status&&d.quote){
+      currentQuote=d.quote.quote||d.quote.text||'';
+      currentAuthor=d.quote.author||'Unknown';
+      document.getElementById('quoteText').textContent=currentQuote;
+      document.getElementById('quoteAuthor').textContent=currentAuthor;
+      document.getElementById('shareWa').href=`https://wa.me/?text=${encodeURIComponent('"'+currentQuote+'" — '+currentAuthor)}`;
+      show('quoteCard');
+    } else {showError('Failed to load quote. Please try again.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+function copyQuote(){
+  navigator.clipboard.writeText(`"${currentQuote}" — ${currentAuthor}`);
+  const el=document.getElementById('quoteCopied');
+  el.classList.remove('hidden');
+  setTimeout(()=>el.classList.add('hidden'),2000);
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+loadQuote();
+</script>
+</body>
+</html>

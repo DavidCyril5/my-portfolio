@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.calc-wrap{max-width:360px;margin:0 auto 40px}
+.calc{background:var(--card);border:1px solid var(--border);border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.calc-display{background:var(--bg2);padding:24px 20px;text-align:right}
+.calc-expr{font-size:14px;color:var(--muted);min-height:22px;margin-bottom:6px;word-break:break-all}
+.calc-num{font-size:40px;font-weight:700;color:var(--text);word-break:break-all;min-height:52px}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.calc-btn{background:var(--card2);border:none;padding:18px 0;font-size:18px;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s;font-family:inherit}
+.calc-btn:hover{background:var(--card)}
+.calc-btn:active{transform:scale(.95)}
+.calc-btn.op{color:var(--accent)}
+.calc-btn.clear{color:var(--danger)}
+.calc-btn.eq{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-size:22px}
+.calc-btn.eq:hover{filter:brightness(1.1)}
+.calc-btn.zero{grid-column:span 2}
+.history{background:var(--card2);border-radius:12px;padding:12px 16px;margin-top:16px;max-height:120px;overflow-y:auto}
+.history p{font-size:12px;color:var(--muted);margin-bottom:4px}
+.history-item{font-size:13px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.history-item:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#0f3460,#16213e)"><i class="fa fa-calculator" style="color:var(--accent)"></i></div>
+      <h1>Calculator</h1>
+      <p>Scientific calculator with history and clean design</p>
+    </div>
+
+    <div class="calc-wrap">
+      <div class="calc">
+        <div class="calc-display">
+          <div class="calc-expr" id="expr"></div>
+          <div class="calc-num" id="display">0</div>
+        </div>
+        <div class="calc-grid">
+          <button class="calc-btn clear" onclick="clearAll()">AC</button>
+          <button class="calc-btn op" onclick="toggleSign()">+/-</button>
+          <button class="calc-btn op" onclick="percent()">%</button>
+          <button class="calc-btn op" onclick="op('/')">÷</button>
+
+          <button class="calc-btn" onclick="num(7)">7</button>
+          <button class="calc-btn" onclick="num(8)">8</button>
+          <button class="calc-btn" onclick="num(9)">9</button>
+          <button class="calc-btn op" onclick="op('*')">×</button>
+
+          <button class="calc-btn" onclick="num(4)">4</button>
+          <button class="calc-btn" onclick="num(5)">5</button>
+          <button class="calc-btn" onclick="num(6)">6</button>
+          <button class="calc-btn op" onclick="op('-')">−</button>
+
+          <button class="calc-btn" onclick="num(1)">1</button>
+          <button class="calc-btn" onclick="num(2)">2</button>
+          <button class="calc-btn" onclick="num(3)">3</button>
+          <button class="calc-btn op" onclick="op('+')">+</button>
+
+          <button class="calc-btn zero" onclick="num(0)">0</button>
+          <button class="calc-btn" onclick="dot()">.</button>
+          <button class="calc-btn eq" onclick="equals()">=</button>
+        </div>
+      </div>
+      <div class="history" id="history">
+        <p>History</p>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+let cur='0',prev='',operator='',justCalc=false,history=[];
+function update(){document.getElementById('display').textContent=cur;}
+function num(n){
+  if(justCalc){cur=String(n);justCalc=false;}
+  else cur=cur==='0'?String(n):cur+n;
+  update();
+}
+function dot(){
+  if(justCalc){cur='0.';justCalc=false;}
+  else if(!cur.includes('.'))cur+='.';
+  update();
+}
+function op(o){
+  if(operator&&!justCalc)equals();
+  prev=cur;operator=o;justCalc=false;
+  document.getElementById('expr').textContent=prev+' '+opSym(o);
+}
+function opSym(o){return{'+':'+','-':'−','*':'×','/':'÷'}[o]||o}
+function equals(){
+  if(!operator||!prev)return;
+  const p=parseFloat(prev),c=parseFloat(cur);
+  let res;
+  switch(operator){
+    case '+':res=p+c;break;case '-':res=p-c;break;
+    case '*':res=p*c;break;case '/':res=c!==0?p/c:'Error';break;
+  }
+  const expr=prev+' '+opSym(operator)+' '+cur+' = '+res;
+  history.unshift(expr);
+  if(history.length>8)history.pop();
+  renderHistory();
+  document.getElementById('expr').textContent=expr;
+  cur=String(res);operator='';prev='';justCalc=true;
+  update();
+}
+function clearAll(){cur='0';prev='';operator='';justCalc=false;document.getElementById('expr').textContent='';update();}
+function toggleSign(){cur=String(-parseFloat(cur));update();}
+function percent(){cur=String(parseFloat(cur)/100);update();}
+function renderHistory(){
+  const h=document.getElementById('history');
+  h.innerHTML='<p>History</p>'+history.map(e=>`<div class="history-item">${e}</div>`).join('');
+}
+document.addEventListener('keydown',e=>{
+  if('0123456789'.includes(e.key))num(e.key);
+  else if(e.key==='.')dot();
+  else if(['+','-','*','/'].includes(e.key))op(e.key);
+  else if(e.key==='Enter'||e.key==='=')equals();
+  else if(e.key==='Escape'||e.key==='c')clearAll();
+  else if(e.key==='Backspace'){cur=cur.length>1?cur.slice(0,-1):'0';update();}
+});
+</script>
+</body>
+</html>

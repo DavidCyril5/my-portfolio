@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.weather-card{background:linear-gradient(135deg,#1a1a28,#22223a);border:1px solid var(--border);border-radius:20px;padding:32px;text-align:center;margin-top:24px}
+.weather-icon{font-size:80px;margin:16px 0;filter:drop-shadow(0 4px 12px rgba(255,215,0,0.3))}
+.temp{font-size:64px;font-weight:800;color:var(--accent);line-height:1}
+.feels{color:var(--muted);font-size:14px;margin-top:8px}
+.city-name{font-size:24px;font-weight:700;margin-top:12px}
+.condition{color:var(--muted);font-size:16px;text-transform:capitalize}
+.weather-details{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.detail{background:rgba(255,255,255,0.05);border-radius:14px;padding:18px 12px;text-align:center}
+.detail i{font-size:24px;margin-bottom:8px;display:block}
+.detail .val{font-size:20px;font-weight:700;margin-bottom:4px}
+.detail .lbl{font-size:12px;color:var(--muted)}
+.search-form{max-width:560px;margin:0 auto}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#f7971e,#ffd200)"><i class="fa fa-cloud-sun" style="color:#fff"></i></div>
+      <h1>Weather App</h1>
+      <p>Real-time weather information for any city worldwide</p>
+    </div>
+
+    <div style="max-width:600px;margin:0 auto 40px">
+      <div class="input-group search-form">
+        <input id="cityInput" type="text" placeholder="Enter city name..." onkeypress="if(event.key==='Enter')getWeather()">
+        <button class="btn btn-primary" onclick="getWeather()"><i class="fa fa-search"></i> Search</button>
+      </div>
+
+      <div id="loader" class="loader hidden"><div class="spinner"></div> Fetching weather...</div>
+      <div id="errorMsg" class="msg-error hidden"></div>
+
+      <div id="result" class="weather-card hidden">
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+          <i class="fa fa-location-dot" style="color:var(--accent)"></i>
+          <span id="cityName" class="city-name"></span>
+          <span id="country" style="color:var(--muted);font-size:14px"></span>
+        </div>
+        <img id="weatherIcon" class="weather-icon" style="width:80px;height:80px;margin:16px auto;display:block" alt="">
+        <div id="condition" class="condition"></div>
+        <div class="temp" id="temp"></div>
+        <div class="feels" id="feels"></div>
+        <div class="weather-details">
+          <div class="detail"><i class="fa fa-droplet" style="color:#4facfe"></i><div class="val" id="humidity"></div><div class="lbl">Humidity</div></div>
+          <div class="detail"><i class="fa fa-wind" style="color:#43e97b"></i><div class="val" id="wind"></div><div class="lbl">Wind Speed</div></div>
+          <div class="detail"><i class="fa fa-eye" style="color:#f093fb"></i><div class="val" id="vis"></div><div class="lbl">Visibility</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+async function getWeather(){
+  const city=document.getElementById('cityInput').value.trim();
+  if(!city){showError('Please enter a city name');return;}
+  show('loader');hide('errorMsg');hide('result');
+  try{
+    const r=await fetch(`${API}/weather?city=${encodeURIComponent(city)}`);
+    const d=await r.json();
+    if(d.success&&d.data){
+      const w=d.data;
+      document.getElementById('cityName').textContent=w.location||city;
+      document.getElementById('country').textContent=w.country||'';
+      document.getElementById('temp').textContent=Math.round(w.temp_c||w.temp||0)+'°C';
+      document.getElementById('feels').textContent='Feels like '+(w.feelslike_c||w.feels_like||'--')+'°C';
+      document.getElementById('condition').textContent=w.condition?.text||w.description||'';
+      document.getElementById('humidity').textContent=(w.humidity||'--')+'%';
+      document.getElementById('wind').textContent=(w.wind_kph||w.wind||'--')+' km/h';
+      document.getElementById('vis').textContent=(w.vis_km||w.visibility||'--')+' km';
+      const icon=w.condition?.icon;
+      const iconEl=document.getElementById('weatherIcon');
+      if(icon){iconEl.src='https:'+icon;iconEl.style.display='block';}
+      else iconEl.style.display='none';
+      show('result');
+    } else {showError('City not found. Please check the spelling.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+getWeather.defaultCity='Lagos';
+document.getElementById('cityInput').value='Lagos';
+window.onload=()=>getWeather();
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markdown Editor | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+.md-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;height:calc(100vh - 160px);min-height:400px;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.md-pane{display:flex;flex-direction:column;overflow:hidden}
+.md-head{padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.md-editor{flex:1;padding:20px;background:var(--card);border:none;outline:none;color:var(--text);font-size:14px;font-family:'Courier New',monospace;resize:none;line-height:1.7;border-right:1px solid var(--border)}
+.md-preview{flex:1;padding:20px;background:var(--card);overflow-y:auto;line-height:1.8;font-size:15px}
+.md-preview h1,.md-preview h2,.md-preview h3{color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin:20px 0 12px}
+.md-preview h1{font-size:28px}.md-preview h2{font-size:22px}.md-preview h3{font-size:18px}
+.md-preview code{background:var(--card2);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:13px;color:#a8ff78}
+.md-preview pre{background:var(--card2);border-radius:10px;padding:16px;overflow-x:auto;border-left:3px solid var(--accent)}
+.md-preview pre code{background:none;padding:0}
+.md-preview blockquote{border-left:3px solid var(--accent);padding:8px 16px;color:var(--muted);margin:12px 0;background:rgba(255,215,0,.05);border-radius:0 8px 8px 0}
+.md-preview a{color:var(--accent)}
+.md-preview table{width:100%;border-collapse:collapse;margin:12px 0}
+.md-preview th{background:var(--card2);padding:10px 14px;text-align:left;font-weight:600}
+.md-preview td{padding:10px 14px;border-bottom:1px solid var(--border)}
+.md-preview img{max-width:100%;border-radius:8px}
+.md-preview ul,.md-preview ol{padding-left:24px}
+.md-preview li{margin:4px 0}
+.toolbar{display:flex;gap:4px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tb-btn{background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px;cursor:pointer;transition:all .2s;font-family:monospace;font-weight:600}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:680px){.md-layout{grid-template-columns:1fr;height:auto}.md-preview{border-top:1px solid var(--border);min-height:300px}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap" style="padding-bottom:24px">
+  <div class="container" style="max-width:1200px">
+    <div class="tool-hero" style="padding:24px 0 16px">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#434343,#000000)"><i class="fa-brands fa-markdown" style="color:var(--accent)"></i></div>
+      <h1>Markdown Editor</h1>
+      <p>Write Markdown with live preview — side by side</p>
+    </div>
+
+    <div class="toolbar">
+      <button class="tb-btn" onclick="ins('**','**')"><b>B</b></button>
+      <button class="tb-btn" onclick="ins('*','*')"><i>I</i></button>
+      <button class="tb-btn" onclick="ins('~~','~~')"><s>S</s></button>
+      <button class="tb-btn" onclick="ins('# ')">H1</button>
+      <button class="tb-btn" onclick="ins('## ')">H2</button>
+      <button class="tb-btn" onclick="ins('### ')">H3</button>
+      <button class="tb-btn" onclick="ins('[text](url)')"><i class="fa fa-link"></i></button>
+      <button class="tb-btn" onclick="ins('`','`')">code</button>
+      <button class="tb-btn" onclick="ins('```\n','\n```')">block</button>
+      <button class="tb-btn" onclick="ins('> ')"><i class="fa fa-quote-right"></i></button>
+      <button class="tb-btn" onclick="ins('- ')"><i class="fa fa-list"></i></button>
+      <button class="tb-btn" onclick="ins('1. ')"><i class="fa fa-list-ol"></i></button>
+      <button class="tb-btn" onclick="ins('---\n')">─</button>
+      <button class="tb-btn" onclick="ins('![alt](url)')"><i class="fa fa-image"></i></button>
+      <button class="tb-btn" onclick="copyMd()"><i class="fa fa-copy"></i></button>
+      <button class="tb-btn" onclick="downloadMd()"><i class="fa fa-download"></i></button>
+    </div>
+
+    <div class="md-layout">
+      <div class="md-pane">
+        <div class="md-head"><i class="fa fa-edit" style="color:var(--accent)"></i> Editor</div>
+        <textarea id="editor" class="md-editor" oninput="render()" placeholder="Start writing Markdown..."></textarea>
+      </div>
+      <div class="md-pane">
+        <div class="md-head"><i class="fa fa-eye" style="color:var(--accent)"></i> Preview</div>
+        <div id="preview" class="md-preview"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const sample=`# Welcome to Markdown Editor
+
+## Features
+- **Live preview** as you type
+- Syntax highlighting
+- Toolbar shortcuts
+- Download as .md file
+
+## Code Example
+\`\`\`javascript
+function greet(name) {
+  return \`Hello, \${name}!\`;
+}
+\`\`\`
+
+## Blockquote
+> "The best code is no code at all." — Jeff Atwood
+
+## Table
+| Name | Tool | Status |
+|------|------|--------|
+| David | Markdown Editor | ✅ Done |
+| You | This editor | ✅ Ready |
+
+Visit [David Cyril](https://davidcyril.name.ng)
+`;
+document.getElementById('editor').value=sample;
+function render(){document.getElementById('preview').innerHTML=marked.parse(document.getElementById('editor').value);}
+function ins(before,after=''){
+  const ta=document.getElementById('editor');
+  const s=ta.selectionStart,e=ta.selectionEnd;
+  const sel=ta.value.substring(s,e);
+  ta.value=ta.value.substring(0,s)+before+sel+after+ta.value.substring(e);
+  ta.focus();ta.selectionStart=s+before.length;ta.selectionEnd=e+before.length;
+  render();
+}
+function copyMd(){navigator.clipboard.writeText(document.getElementById('editor').value);}
+function downloadMd(){
+  const a=document.createElement('a');
+  a.href='data:text/markdown;charset=utf-8,'+encodeURIComponent(document.getElementById('editor').value);
+  a.download='document.md';a.click();
+}
+render();
+</script>
+</body>
+</html>

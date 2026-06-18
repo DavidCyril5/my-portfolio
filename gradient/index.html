@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradient Generator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.gradient-preview{height:220px;border-radius:16px;margin-bottom:24px;transition:background .3s;position:relative;cursor:pointer}
+.gradient-preview .copy-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;background:rgba(0,0,0,.3);border-radius:16px;font-weight:700;font-size:14px}
+.gradient-preview:hover .copy-overlay{opacity:1}
+.color-stops{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stop-item{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:10px;padding:10px 14px}
+.stop-item input[type=color]{width:40px;height:32px;border:none;background:none;cursor:pointer;border-radius:6px}
+.stop-item input[type=number]{width:60px;background:transparent;border:none;color:var(--text);font-size:13px;text-align:center;font-family:monospace}
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;margin-top:12px}
+.preset{height:40px;border-radius:8px;cursor:pointer;transition:transform .2s;border:2px solid transparent}
+.preset:hover{transform:scale(1.1);border-color:rgba(255,255,255,.3)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#f6d365,#fda085)"><i class="fa fa-brush" style="color:#fff"></i></div>
+      <h1>Gradient Generator</h1>
+      <p>Create beautiful CSS gradients with live preview and copy</p>
+    </div>
+
+    <div style="max-width:640px;margin:0 auto 40px">
+      <div class="card">
+        <div class="gradient-preview" id="gradientPreview" onclick="copyCss()">
+          <div class="copy-overlay"><i class="fa fa-copy" style="margin-right:8px"></i>Click to copy CSS</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Type</label>
+            <select id="gradType" class="input-field" style="margin:0" onchange="update()">
+              <option value="linear">Linear</option>
+              <option value="radial">Radial</option>
+              <option value="conic">Conic</option>
+            </select>
+          </div>
+          <div id="angleWrap">
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Angle: <span id="angleVal">135</span>°</label>
+            <input type="range" id="angle" min="0" max="360" value="135" oninput="update()" style="width:100%;accent-color:var(--accent);margin-top:6px">
+          </div>
+        </div>
+
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Color Stops</p>
+        <div class="color-stops" id="colorStops"></div>
+        <div style="display:flex;gap:10px;margin-bottom:20px">
+          <button class="btn btn-secondary btn-sm" onclick="addStop()"><i class="fa fa-plus"></i> Add Stop</button>
+          <button class="btn btn-secondary btn-sm" onclick="removeStop()"><i class="fa fa-minus"></i> Remove</button>
+        </div>
+
+        <div style="background:var(--card2);border-radius:10px;padding:14px;font-family:monospace;font-size:13px;color:var(--accent);word-break:break-all" id="cssCode"></div>
+        <button class="btn btn-primary btn-full" style="margin-top:12px" onclick="copyCss()"><i class="fa fa-copy"></i> Copy CSS</button>
+
+        <p style="font-size:13px;color:var(--muted);margin:20px 0 10px"><i class="fa fa-fire" style="color:var(--accent);margin-right:8px"></i>Preset Gradients</p>
+        <div class="presets" id="presets"></div>
+
+        <div id="copiedMsg" class="msg-info" style="display:none;text-align:center;margin-top:12px">✓ Copied to clipboard!</div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const presetList=[['#FFD700','#FF6B35'],['#667eea','#764ba2'],['#11998e','#38ef7d'],['#f953c6','#b91d73'],['#43e97b','#38f9d7'],['#4facfe','#00f2fe'],['#f6d365','#fda085'],['#30cfd0','#330867'],['#a18cd1','#fbc2eb'],['#ffecd2','#fcb69f'],['#ff9a9e','#fad0c4'],['#a1c4fd','#c2e9fb']];
+let stops=[{c:'#FFD700',pos:0},{c:'#FF6B35',pos:100}];
+
+function addStop(){if(stops.length<5){stops.push({c:'#ffffff',pos:50});render();update();}}
+function removeStop(){if(stops.length>2){stops.pop();render();update();}}
+function render(){
+  document.getElementById('colorStops').innerHTML=stops.map((s,i)=>`
+    <div class="stop-item">
+      <input type="color" value="${s.c}" oninput="stops[${i}].c=this.value;update()">
+      <input type="number" value="${s.pos}" min="0" max="100" oninput="stops[${i}].pos=+this.value;update()">%
+    </div>
+  `).join('');
+}
+function update(){
+  const type=document.getElementById('gradType').value;
+  const angle=document.getElementById('angle').value;
+  document.getElementById('angleVal').textContent=angle;
+  document.getElementById('angleWrap').style.display=type==='radial'?'none':'block';
+  const sorted=[...stops].sort((a,b)=>a.pos-b.pos);
+  const colorStr=sorted.map(s=>`${s.c} ${s.pos}%`).join(', ');
+  let css;
+  if(type==='linear')css=`linear-gradient(${angle}deg, ${colorStr})`;
+  else if(type==='radial')css=`radial-gradient(circle, ${colorStr})`;
+  else css=`conic-gradient(from ${angle}deg, ${colorStr})`;
+  document.getElementById('gradientPreview').style.background=css;
+  document.getElementById('cssCode').textContent=`background: ${css};`;
+}
+function copyCss(){
+  const css=document.getElementById('cssCode').textContent;
+  navigator.clipboard.writeText(css);
+  const msg=document.getElementById('copiedMsg');msg.style.display='block';setTimeout(()=>msg.style.display='none',2000);
+}
+// Presets
+const p=document.getElementById('presets');
+presetList.forEach(([c1,c2])=>{
+  const d=document.createElement('div');
+  d.className='preset';d.style.background=`linear-gradient(135deg,${c1},${c2})`;
+  d.title=`${c1} → ${c2}`;
+  d.onclick=()=>{stops=[{c:c1,pos:0},{c:c2,pos:100}];render();update();};
+  p.appendChild(d);
+});
+render();update();
+</script>
+</body>
+</html>

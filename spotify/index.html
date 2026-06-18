@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotify Downloader | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#1DB954,#158a3e)"><i class="fab fa-spotify"></i></div>
+      <h1>Spotify Downloader</h1>
+      <p>Download Spotify songs as high-quality MP3 — free & fast</p>
+      <div class="features" style="margin-top:16px">
+        <span class="tag tag-accent">MP3 Download</span>
+        <span class="tag tag-accent">High Quality</span>
+        <span class="tag">Song Info</span>
+        <span class="tag">Cover Art</span>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:680px;margin:0 auto 40px">
+      <div class="input-group">
+        <input id="urlInput" type="text" placeholder="Paste Spotify song URL here...">
+        <button class="btn btn-primary" onclick="download()"><i class="fa fa-search"></i> Fetch</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted)">Example: https://open.spotify.com/track/...</p>
+
+      <div id="loader" class="loader hidden"><div class="spinner"></div> Fetching song info...</div>
+      <div id="errorMsg" class="msg-error hidden"></div>
+
+      <div id="result" class="hidden" style="margin-top:24px">
+        <div style="display:flex;gap:20px;align-items:center;background:var(--bg2);padding:20px;border-radius:14px">
+          <img id="thumb" style="width:100px;height:100px;border-radius:10px;object-fit:cover;flex-shrink:0" alt="">
+          <div>
+            <h3 id="title" style="font-size:18px;font-weight:700;margin-bottom:6px"></h3>
+            <p id="artist" style="color:var(--muted);font-size:14px;margin-bottom:4px"></p>
+            <p id="duration" style="color:var(--muted);font-size:13px"></p>
+          </div>
+        </div>
+        <div class="result-actions" style="margin-top:16px">
+          <a id="dlMP3" href="#" target="_blank" class="btn btn-primary btn-full"><i class="fa fa-music"></i> Download MP3</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a> &bull; Powered by <a href="https://apis.davidcyril.name.ng" target="_blank">David Cyril APIs</a></footer>
+</div>
+<script>
+const API='https://apis.davidcyril.name.ng';
+async function download(){
+  const url=document.getElementById('urlInput').value.trim();
+  if(!url){showError('Please enter a Spotify URL');return;}
+  show('loader');hide('errorMsg');hide('result');
+  try{
+    const r=await fetch(`${API}/spotifydl?url=${encodeURIComponent(url)}`);
+    const d=await r.json();
+    if(d.success){
+      document.getElementById('thumb').src=d.thumbnail||'';
+      document.getElementById('title').textContent=d.title||'Unknown Song';
+      document.getElementById('artist').textContent='Artist: '+(d.channel||'Unknown');
+      document.getElementById('duration').textContent='Duration: '+(d.duration||'Unknown');
+      document.getElementById('dlMP3').href=d.DownloadLink||'#';
+      show('result');
+    } else {showError('Failed to fetch song. Please check the Spotify URL.');}
+  } catch(e){showError('An error occurred. Please try again.');}
+  hide('loader');
+}
+function show(id){document.getElementById(id).classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;show('errorMsg');}
+</script>
+</body>
+</html>

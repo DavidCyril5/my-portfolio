@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg" type="image">
+    <title>David Cyril | Portfolio & Projects</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6690222744270600"
+     crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #25D366;
+            --primary-dark: #128C7E;
+            --secondary: #075E54;
+            --accent: #FFD700;
+            --dark: #121212;
+            --darker: #0A0A0A;
+            --light: #FFFFFF;
+            --gray: #B0B0B0;
+            --card-bg: #1E1E1E;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.05) 0px, transparent 50%);
+        }
+
+        header {
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            background: rgba(18, 18, 18, 0.95);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--accent);
+        }
+
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Portfolio Section */
+        .portfolio {
+            padding: 150px 5% 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .profile-img {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .portfolio-content {
+            flex: 1;
+        }
+
+        .portfolio h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--accent), var(--light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .portfolio h2 {
+            font-size: 1.5rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .portfolio p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--gray);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray);
+        }
+
+        .contact-item i {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .tech-stack {
+            margin-top: 30px;
+        }
+
+        .tech-stack h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech-tag {
+            background: rgba(37, 211, 102, 0.15);
+            color: var(--primary);
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+
+        .social-links-portfolio {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .social-links-portfolio a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            color: var(--light);
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+        }
+
+        .social-links-portfolio a:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+            color: var(--light);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 5% 80px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--primary);
+            color: var(--light);
+            padding: 14px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+            margin: 20px 0;
+        }
+
+        .whatsapp-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .whatsapp-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Projects Section */
+        .projects {
+            padding: 60px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            border-radius: 3px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 40px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .project-card:hover .project-img {
+            transform: scale(1.05);
+        }
+
+        .project-info {
+            padding: 30px;
+        }
+
+        .project-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+
+        .project-info p {
+            color: var(--gray);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+
+        .visit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary);
+            color: var(--light);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1.05rem;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .visit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        .visit-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 5% 30px;
+            border-top: 1px solid var(--glass-border);
+            color: var(--gray);
+            background: var(--darker);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .social-links a {
+            color: var(--gray);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        .copyright {
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .portfolio {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 5%;
+            }
+            
+            nav {
+                width: 100%;
+                display: flex;
+                justify-content: space-around;
+            }
+            
+            .portfolio {
+                padding: 130px 5% 60px;
+            }
+            
+            .hero {
+                padding: 60px 5% 60px;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .portfolio h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .project-info h3 {
+                font-size: 1.5rem;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">
+            <i class="fas fa-code"></i>
+            <span>David Cyril</span>
+        </a>
+        <nav>
+            <a href="#portfolio">Portfolio</a>
+            <a href="#projects">Projects</a>
+            <a href="https://support.david-cyril.net.ng">FAQ</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section class="portfolio" id="portfolio">
+        <div class="profile-container">
+            <img src="https://files.catbox.moe/4hq1u5.jpg" alt="David Cyril" class="profile-img">
+        </div>
+        <div class="portfolio-content">
+            <h1>David Cyril</h1>
+            <h2>Full Stack Developer</h2>
+            <p>I'm a 19-year-old developer from Abuja, Nigeria, passionate about creating innovative web applications and tools that make a difference. I specialize in building modern, user-friendly applications with cutting-edge technologies.</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+234 906 652 8353</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>+234 812 998 8915</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Davidcyril209@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Abuja, Nigeria</span>
+                </div>
+            </div>
+            
+            <div class="tech-stack">
+                <h3>🛠️ Tech Stack</h3>
+                <div class="tech-tags">
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag">Express.js</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">TypeScript</span>
+                    <span class="tech-tag">MongoDB</span>
+                    <span class="tech-tag">MySQL</span>
+                    <span class="tech-tag">Git</span>
+                    <span class="tech-tag">VS Code</span>
+                    <span class="tech-tag">Postman</span>
+                </div>
+            </div>
+            
+            <div class="social-links-portfolio">
+                <a href="https://github.com/DavidCyrilTech" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://t.me/davidcyriltechs" target="_blank"><i class="fab fa-telegram"></i></a>
+                <a href="https://whatsapp.com/channel/0029VbCZErf3WHTPJ0TD9Y33" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.youtube.com/@DavidCyril_TECH" target="_blank"><i class="fab fa-youtube"></i></a>
+                <a href="https://t.me/deecee_x" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero">
+        <h1>Innovative Projects That Make a Difference</h1>
+        <p>Explore my collection of web applications, tools, and creative projects. Each project is built with modern technologies and designed for optimal user experience.</p>
+        
+        <a href="https://whatsapp.com/channel/0029VbCZErf3WHTPJ0TD9Y33" class="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Follow My WhatsApp Channel
+        </a>
+    </section>
+
+    <section class="projects" id="projects">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="projects-grid">
+
+            <!-- 1. Cineverse -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/b8/4a/af/b84aaffda0f506c229d7428bae5564a2.jpg" alt="Cineverse" class="project-img">
+                <div class="project-info">
+                    <h3>Cineverse</h3>
+                    <p>Download Bollywood, Hollywood, South movies and more — all in one place. Your ultimate movie streaming and download hub.</p>
+                    <a href="https://cinverse.com.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. David Cyril APIs -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/0e/4f/dc/0e4fdce8ac22e09688c580e5bc4dcd7d.jpg" alt="David Cyril APIs" class="project-img">
+                <div class="project-info">
+                    <h3>David Cyril APIs</h3>
+                    <p>A powerful collection of free and premium APIs built by David Cyril — covering media, AI, utilities, and more for developers.</p>
+                    <a href="https://apis.davidcyril.name.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. BoostPro -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1683721003111-070bcc053d8b?fm=jpg&q=80&w=600&h=300&fit=crop" alt="BoostPro" class="project-img">
+                <div class="project-info">
+                    <h3>BoostPro</h3>
+                    <p>Grow your social media presence fast. Boost followers, likes, views, and engagement across all major platforms instantly.</p>
+                    <a href="https://boostpro.name.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. AI Music Generator -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/736x/54/1e/9c/541e9c48edbde7ee6e1e051d25a5294f.jpg" alt="AI Music Generator" class="project-img">
+                <div class="project-info">
+                    <h3>AI Music Generator</h3>
+                    <p>Generate original music tracks using cutting-edge AI. Just describe the vibe you want and let the AI compose it for you.</p>
+                    <a href="https://aimusic.cityfinc.org" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 5. AI Video Generator -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1697577418970-95d99b5a55cf?fm=jpg&q=80&w=600&h=300&fit=crop" alt="AI Video Generator" class="project-img">
+                <div class="project-info">
+                    <h3>AI Video Generator</h3>
+                    <p>Create stunning AI-generated videos from text prompts. Powered by Sora-style technology for next-level visual storytelling.</p>
+                    <a href="https://sora.cityfinc.org" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 6. Cityfinc Nodes -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1666875753105-c63a6f3bdc86?fm=jpg&q=80&w=600&h=300&fit=crop" alt="Cityfinc Nodes" class="project-img">
+                <div class="project-info">
+                    <h3>Cityfinc Nodes</h3>
+                    <p>CityFinc — a premium SMM panel and digital services marketplace for buying and reselling social media growth services.</p>
+                    <a href="https://cityfinc.org" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 7. TikTok Downloader -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/27/27/40/272740856f06762c8dada2ed8a205fb7.jpg" alt="TikTok Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>TikTok Downloader</h3>
+                    <p>Download TikTok videos in high quality without watermarks. Supports video and audio extraction with a single click.</p>
+                    <a href="https://tiksave.name.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 8. Facebook Downloader -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/2c/87/eb/2c87ebf3a0fbbd168dd64a3b6b84e15e.jpg" alt="Facebook Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>Facebook Downloader</h3>
+                    <p>Download Facebook videos and save them directly for free — fast, easy, and no registration required.</p>
+                    <a href="https://fb.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 9. Savetube (YouTube Downloader) -->
+            <div class="project-card">
+                <img src="https://files.catbox.moe/k0pbyt.jpg" alt="Savetube YouTube Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>Savetube – YouTube Downloader</h3>
+                    <p>The best free YouTube video downloader. Paste any YouTube URL and download instantly — fast, no ads, unlimited.</p>
+                    <a href="https://savetube.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 10. Instagram Downloader -->
+            <div class="project-card">
+                <img src="https://files.catbox.moe/hzalju.jpg" alt="Instagram Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>Instagram Downloader</h3>
+                    <p>Download Instagram Reels, videos, and photos directly for free — no login needed, instant results.</p>
+                    <a href="https://insta.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 11. Tweet Generator -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/9d/55/8b/9d558b7b57f7691f6da97980fc59521c.jpg" alt="Tweet Generator" class="project-img">
+                <div class="project-info">
+                    <h3>Tweet Generator</h3>
+                    <p>Generate realistic-looking fake tweets for fun, memes, or creative projects. Fully customizable username, handle, and content.</p>
+                    <a href="https://tweet.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 12. Anita Deployment Site -->
+            <div class="project-card">
+                <img src="https://files.catbox.moe/0ly0h6.jpg" alt="Anita Bot" class="project-img">
+                <div class="project-info">
+                    <h3>Anita – WhatsApp Bot</h3>
+                    <p>Anita is a powerful WhatsApp automation bot. Deploy your own instance and automate messages, replies, and much more.</p>
+                    <a href="https://anita.name.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 13. Anita Session ID Generator -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1636751364472-12bfad09b451?fm=jpg&q=80&w=600&h=300&fit=crop" alt="Anita Session ID Generator" class="project-img">
+                <div class="project-info">
+                    <h3>Anita Session ID Generator</h3>
+                    <p>Generate a WhatsApp session ID (pairing code) for the Anita bot — fast, secure, and easy to use.</p>
+                    <a href="https://pair.anita.name.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 14. Temp Mail Generator -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/474x/92/eb/9e/92eb9e937624b4c49d6e303e834b7ec2.jpg" alt="Temp Mail Generator" class="project-img">
+                <div class="project-info">
+                    <h3>Temp Mail Generator</h3>
+                    <p>Get a free, temporary, and anonymous email address instantly. Perfect for sign-ups, verifications, and protecting your privacy.</p>
+                    <a href="https://tempmail.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 15. X Downloader -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/9d/55/8b/9d558b7b57f7691f6da97980fc59521c.jpg" alt="X Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>X (Twitter) Downloader</h3>
+                    <p>Download videos and media from X (formerly Twitter) in MP4 format — free, fast, and no watermark.</p>
+                    <a href="http://xdl.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 16. Cineverse APK -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/1a/49/22/1a49226d155846acb790eeb919f63c8e.jpg" alt="Cineverse APK" class="project-img">
+                <div class="project-info">
+                    <h3>Cineverse APK</h3>
+                    <p>Download the official Cineverse Android app and enjoy movies, series, and entertainment on the go — completely free.</p>
+                    <a href="https://app.cinverse.com.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 17. Image Enhancer -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/05/cf/6d/05cf6d376202ae42d10200e48e4657b9.jpg" alt="Image Enhancer" class="project-img">
+                <div class="project-info">
+                    <h3>Image Enhancer</h3>
+                    <p>Transform grainy, pixelated photos instantly with Remini's advanced AI technology. Restore and sharpen any image in seconds.</p>
+                    <a href="http://remini.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 18. Video 4K Enhancer -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?fm=jpg&q=80&w=600&h=300&fit=crop" alt="Video 4K Enhancer" class="project-img">
+                <div class="project-info">
+                    <h3>Video 4K Enhancer</h3>
+                    <p>Upscale and enhance your videos to 4K quality using AI. Turn blurry, low-resolution footage into sharp, crystal-clear video.</p>
+                    <a href="https://hd.cityfinc.org" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 19. VCF Generator -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/06/e1/ae/06e1aef53e1dd3d86982963fd72d4f15.jpg" alt="VCF Generator" class="project-img">
+                <div class="project-info">
+                    <h3>VCF Contact Generator</h3>
+                    <p>Easily generate a VCF contact file with your name and phone number for sharing in WhatsApp groups and communities.</p>
+                    <a href="https://vcf.davidcyril.name.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 20. Support / Donation -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?fm=jpg&q=80&w=600&h=300&fit=crop" alt="Support & Donation" class="project-img">
+                <div class="project-info">
+                    <h3>Support & Donation</h3>
+                    <p>Love my work? Support me! Your donations help me keep building free tools and projects for everyone to enjoy.</p>
+                    <a href="https://donate.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 21. Calculator -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/52/bd/e1/52bde1fee2c550973f292daf860873da.jpg" alt="Calculator" class="project-img">
+                <div class="project-info">
+                    <h3>Calculator</h3>
+                    <p>A sleek, modern web calculator for everyday arithmetic — clean design and lightning-fast calculations right in your browser.</p>
+                    <a href="https://david-cyril.net.ng/projects/calculator" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 22. JS Obfuscator -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/0e/4f/dc/0e4fdce8ac22e09688c580e5bc4dcd7d.jpg" alt="JS Obfuscator" class="project-img">
+                <div class="project-info">
+                    <h3>JS Obfuscator</h3>
+                    <p>Protect your JavaScript source code by obfuscating it into unreadable but fully functional code — free and instant.</p>
+                    <a href="https://obfuscator.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 23. AI Image Generator -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/a9/46/80/a946805f26c6099f6225845271fa78d6.jpg" alt="AI Image Generator" class="project-img">
+                <div class="project-info">
+                    <h3>AI Image Generator</h3>
+                    <p>Bring your imagination to life with our free online AI image generator. Just type a prompt and watch it become art.</p>
+                    <a href="https://david-cyril.net.ng/projects/image-generator/" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 24. Currency Converter -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/7f/cd/a7/7fcda7a23c157e3245f2c94dc6075ebb.jpg" alt="Currency Converter" class="project-img">
+                <div class="project-info">
+                    <h3>Currency Converter</h3>
+                    <p>Free, real-time currency converter supporting all major world currencies. Quick, accurate, and always up to date.</p>
+                    <a href="https://david-cyril.net.ng/projects/currency/" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 25. Text To Speech -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/5f/e4/bc/5fe4bce4517d94e9b6120593893c16c4.jpg" alt="Text To Speech" class="project-img">
+                <div class="project-info">
+                    <h3>Nexus Text To Speech</h3>
+                    <p>Free AI text-to-speech tool supporting 100+ languages and 600+ AI voices. Convert any text into natural-sounding audio instantly.</p>
+                    <a href="https://tts.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- 26. Giveaway Quiz Web -->
+            <div class="project-card">
+                <img src="https://images.unsplash.com/photo-1515172013099-a1a53deb7927?fm=jpg&q=80&w=600&h=300&fit=crop" alt="Giveaway Quiz" class="project-img">
+                <div class="project-info">
+                    <h3>Giveaway Quiz</h3>
+                    <p>Participate in exciting giveaway quizzes and win prizes. Answer questions, climb the leaderboard, and claim your rewards.</p>
+                    <a href="https://giveaway.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="social-links">
+            <a href="https://github.com/DavidCyrilTech"><i class="fab fa-github"></i></a>
+            <a href="https://t.me/davidcyriltechs"><i class="fab fa-telegram"></i></a>
+            <a href="https://whatsapp.com/channel/0029VbCZErf3WHTPJ0TD9Y33"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.youtube.com/@DavidCyril_TECH"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p class="copyright">© 2024 - 2099 David Cyril. All rights reserved.</p>
+    </footer>
+</body>
+</html>

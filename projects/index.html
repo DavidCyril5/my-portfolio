@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David Cyril | Projects</title>
+    <!-- AdSense Code -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6690222744270600"
+     crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #25D366; /* WhatsApp green */
+            --primary-dark: #128C7E;
+            --secondary: #075E54;
+            --accent: #FFD700;
+            --dark: #121212;
+            --darker: #0A0A0A;
+            --light: #FFFFFF;
+            --gray: #B0B0B0;
+            --card-bg: #1E1E1E;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.05) 0px, transparent 50%);
+        }
+
+        /* Header */
+        header {
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            background: rgba(18, 18, 18, 0.95);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--accent);
+        }
+
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 5% 80px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--primary);
+            color: var(--light);
+            padding: 14px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+            margin: 20px 0;
+        }
+
+        .whatsapp-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .whatsapp-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Projects Grid */
+        .projects {
+            padding: 60px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            border-radius: 3px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 40px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .project-card:hover .project-img {
+            transform: scale(1.05);
+        }
+
+        .project-info {
+            padding: 30px;
+        }
+
+        .project-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+
+        .project-info p {
+            color: var(--gray);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tag {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--accent);
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .visit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary);
+            color: var(--light);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1.05rem;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .visit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        .visit-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 5% 30px;
+            border-top: 1px solid var(--glass-border);
+            color: var(--gray);
+            background: var(--darker);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .social-links a {
+            color: var(--gray);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        .copyright {
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 5%;
+            }
+            
+            nav {
+                width: 100%;
+                display: flex;
+                justify-content: space-around;
+            }
+            
+            .hero {
+                padding: 150px 5% 60px;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .project-info h3 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">
+            <i class="fas fa-code"></i>
+            <span>David Cyril Projects</span>
+        </a>
+        <nav>
+            <a href="#projects">Projects</a>
+            <a href="https://support.david-cyril.net.ng">FAQ</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Innovative Projects That Make a Difference</h1>
+        <p>Explore my collection of web applications, tools, and creative projects. Each project is built with modern technologies and designed for optimal user experience.</p>
+        
+        <!-- WhatsApp Button -->
+        <a href="https://www.whatsapp.com/channel/0029VaeRru3ADTOEKPCPom0L" class="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Follow My WhatsApp Channel
+        </a>
+    </section>
+
+    <section class="projects" id="projects">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="projects-grid">
+            <!-- Project 1: TikTok Downloader -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/27/27/40/272740856f06762c8dada2ed8a205fb7.jpg" alt="TikTok Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>TikTok Downloader</h3>
+                    <p>High-quality TikTok video downloads without watermarks. Supports video and audio extraction with a single click.</p>
+                    <a href="https://tiktok.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- Project 2: URL Shortener -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/d7/d6/56/d7d656d59bf24a52ecfab7b37229453a.jpg" alt="Ai Chat Bot" class="project-img">
+                <div class="project-info">
+                    <h3>AI Chat Bot</h3>
+                    <p>Chat AI Project Developed By David Cyril</p>
+    
+                    <a href="/projects/chatbot" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- Project 3: Weather Dashboard -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/05/cf/6d/05cf6d376202ae42d10200e48e4657b9.jpg" alt="Photo Enhancer" class="project-img">
+                <div class="project-info">
+                    <h3>Photo Enhancer</h3>
+                    <p>Transform your grainy, pixelated photos. Enhance them instantly with Remini’s advanced AI technology</p>
+                  <a href="/projects/remini" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+
+            <!-- Project 4: E-commerce Platform -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/2c/87/eb/2c87ebf3a0fbbd168dd64a3b6b84e15e.jpg" alt="Facebook Video Downlaoder" class="project-img">
+                <div class="project-info">
+                    <h3>Faceboook Downloader<h3>
+                    <p>Download Facebook Videos and Save them directly from facebook here for free.<h3>
+                    <a href="/projects/facebook" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- Spotify Downloader -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/b9/18/1a/b9181aa3a8d68bc6f67e01de48acfe2f.jpg" alt="Spotify Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>Spotify Downlaoder</h3>
+                    <p>FREE Spotify song downloader that instantly downloads your favorite tracks, playlists, and albums from Spotify in MP3 format.</p>
+                    <a href="/projects/spotify" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+
+             <!-- Remove BG -->
+             <div class="project-card">
+                <img src="https://i.pinimg.com/474x/92/eb/9e/92eb9e937624b4c49d6e303e834b7ec2.jpg" alt="Temp Mail" class="project-img">
+                <div class="project-info">
+                    <h3>Temp Mail Generator</h3>
+                    <p>Temp Mail provides temporary, anonymous, free, secure, disposable email address. You can use on facebook, twitter or instagram for anonymously.</p>
+                    <a href="https://tempmail.david-cyril.net.ng" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <!-- Remove BG -->
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/5a/ae/64/5aae641d4a8cdafb7844ac0739a90fb5.jpg" alt="Youtube Downlaoder" class="project-img">
+                <div class="project-info">
+                    <h3>Image Background Remover</h3>
+                    <p>Instantly remove image backgrounds with our AI tool.</p>
+                    <a href="/projects/removebg" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+ <div class="project-card">
+                <img src="https://i.pinimg.com/564x/1a/49/22/1a49226d155846acb790eeb919f63c8e.jpg" alt="Apk Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>Apk Downloader</h3>
+                    <p>Instantly remove image backgrounds with our AI tool.</p>
+                    <a href="/projects/apk" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+<div class="project-card">
+                <img src="https://i.pinimg.com/564x/1a/49/22/1a49226d155846acb790eeb919f63c8e.jpg" alt="Apk Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>Apk Downloader</h3>
+                    <p>Instantly remove image backgrounds with our AI tool.</p>
+                    <a href="/projects/apk" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <img src="https://files.catbox.moe/k0pbyt.jpg" alt="Youtube Downloader" class="project-img">
+                <div class="project-info">
+                    <h3>Youtube Downloader</h3>
+                    <p>The Best Free YouTube Video Downloader! Paste a YouTube URL to start downloading now—fast, no ads, and unlimited.</p>
+                    <a href="/projects/youtube" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/a9/46/80/a946805f26c6099f6225845271fa78d6.jpg" alt="Ai Image Generator" class="project-img">
+                <div class="project-info">
+                    <h3>Ai Image Generator</h3>
+                    <p>Bring your imagination to life with our Free Online AI Image Generator.</p>
+                    <a href="/projects/image-generator" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            <div class="project-card">
+                <img src="https://i.pinimg.com/564x/7f/cd/a7/7fcda7a23c157e3245f2c94dc6075ebb.jpg" alt="Currency Converter" class="project-img">
+                <div class="project-info">
+                    <h3>Currency Converter</h3>
+                    <p>Free Currency Converter.</p>
+                    <a href="/projects/currency" class="visit-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Visit Project
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="social-links">
+            <a href="https://github.com/DavidCyrilTech"><i class="fab fa-github"></i></a>
+            <a href="https://t.me/davidcyriltechs"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.whatsapp.com/channel/0029VaeRru3ADTOEKPCPom0L"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.youtube.com/@DavidCyril_TECH"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p class="copyright">© 2024 - 2099 David Cyril. All rights reserved.</p>
+    </footer>
+</body>
+</html>

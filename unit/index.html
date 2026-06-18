@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit Converter | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:24px}
+.cat-btn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .2s}
+.cat-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cat-btn.active{background:rgba(255,215,0,.1);border-color:var(--accent);color:var(--accent)}
+.cat-btn i{display:block;font-size:20px;margin-bottom:6px}
+.conv-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:12px;margin-bottom:14px}
+.conv-row select{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;cursor:pointer;outline:none;width:100%}
+.swap-btn{background:var(--card2);border:1px solid var(--border);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--accent);font-size:16px;transition:all .2s}
+.swap-btn:hover{background:rgba(255,215,0,.1)}
+.result-box{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:20px;text-align:center;margin-top:16px}
+.result-num{font-size:36px;font-weight:800;color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c)"><i class="fa fa-exchange-alt" style="color:#fff"></i></div>
+      <h1>Unit Converter</h1>
+      <p>Convert between units of length, weight, temperature, and more</p>
+    </div>
+
+    <div style="max-width:600px;margin:0 auto 40px">
+      <div class="card">
+        <div class="cat-grid">
+          <div class="cat-btn active" onclick="setCat('length',this)"><i class="fa fa-ruler"></i>Length</div>
+          <div class="cat-btn" onclick="setCat('weight',this)"><i class="fa fa-weight"></i>Weight</div>
+          <div class="cat-btn" onclick="setCat('temp',this)"><i class="fa fa-thermometer"></i>Temp</div>
+          <div class="cat-btn" onclick="setCat('area',this)"><i class="fa fa-vector-square"></i>Area</div>
+          <div class="cat-btn" onclick="setCat('volume',this)"><i class="fa fa-flask"></i>Volume</div>
+          <div class="cat-btn" onclick="setCat('speed',this)"><i class="fa fa-tachometer-alt"></i>Speed</div>
+          <div class="cat-btn" onclick="setCat('data',this)"><i class="fa fa-database"></i>Data</div>
+          <div class="cat-btn" onclick="setCat('time',this)"><i class="fa fa-clock"></i>Time</div>
+        </div>
+
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px">Value</label>
+        <input id="value" class="input-field" type="number" placeholder="Enter value..." oninput="convert()" value="1">
+
+        <div class="conv-row">
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">From</label><select id="fromUnit" onchange="convert()"></select></div>
+          <div class="swap-btn" onclick="swapUnits()"><i class="fa fa-exchange-alt"></i></div>
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">To</label><select id="toUnit" onchange="convert()"></select></div>
+        </div>
+
+        <div class="result-box">
+          <div class="result-num" id="result">—</div>
+          <div style="color:var(--muted);font-size:14px;margin-top:6px" id="resultLabel"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const units={
+  length:{m:1,km:0.001,cm:100,mm:1000,inch:39.3701,ft:3.28084,yard:1.09361,mile:0.000621371,nm:1e9,um:1e6},
+  weight:{kg:1,g:1000,mg:1e6,lb:2.20462,oz:35.274,ton:0.001,'metric-ton':0.001,stone:0.157473},
+  area:{m2:1,km2:1e-6,cm2:10000,mm2:1e6,ft2:10.7639,in2:1550,acre:0.000247105,hectare:1e-4},
+  volume:{L:1,mL:1000,m3:0.001,cm3:1000,ft3:0.0353147,in3:61.0237,gallon:0.264172,qt:1.05669,pint:2.11338,cup:4.22675,tbsp:67.628,tsp:202.884},
+  speed:{mps:1,'km/h':3.6,mph:2.23694,knot:1.94384,fps:3.28084},
+  time:{s:1,ms:1000,min:1/60,hour:1/3600,day:1/86400,week:1/604800,month:1/2629800,year:1/31557600},
+  data:{B:1,KB:1/1024,MB:1/1048576,GB:1/1073741824,TB:1/1099511627776,bit:8,Kbit:8/1024,Mbit:8/1048576,Gbit:8/1073741824},
+  temp:{C:null,F:null,K:null}
+};
+let cat='length';
+function setCat(c,el){cat=c;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');populateUnits();convert();}
+function populateUnits(){
+  const keys=Object.keys(units[cat]);
+  ['fromUnit','toUnit'].forEach((id,i)=>{
+    const s=document.getElementById(id);s.innerHTML=keys.map(k=>`<option value="${k}">${k}</option>`).join('');
+    s.selectedIndex=i===1?Math.min(1,keys.length-1):0;
+  });
+}
+function convert(){
+  const v=parseFloat(document.getElementById('value').value);
+  const from=document.getElementById('fromUnit').value;
+  const to=document.getElementById('toUnit').value;
+  if(isNaN(v)){document.getElementById('result').textContent='—';return;}
+  let res;
+  if(cat==='temp'){
+    let c;
+    if(from==='C')c=v;else if(from==='F')c=(v-32)*5/9;else c=v-273.15;
+    if(to==='C')res=c;else if(to==='F')res=c*9/5+32;else res=c+273.15;
+  } else {
+    const base=v/units[cat][from];res=base*units[cat][to];
+  }
+  document.getElementById('result').textContent=Number(res.toPrecision(7)).toString();
+  document.getElementById('resultLabel').textContent=`${v} ${from} = ${Number(res.toPrecision(7))} ${to}`;
+}
+function swapUnits(){
+  const f=document.getElementById('fromUnit'),t=document.getElementById('toUnit');
+  const tmp=f.value;f.value=t.value;t.value=tmp;convert();
+}
+populateUnits();convert();
+</script>
+</body>
+</html>

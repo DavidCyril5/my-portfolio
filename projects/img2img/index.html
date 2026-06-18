@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image-to-Image AI | David Cyril</title>
+<meta name="description" content="Edit and transform existing photos using AI prompts with Seedream and GPT Image 2. Free.">
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#8b5cf6;--p2:#a78bfa;--dark:#0F0F0F;--card:#1E1E1E;--glass:rgba(30,30,30,0.85);--gb:rgba(255,255,255,0.1);--text:#fff;--muted:#aaa;--tr:all 0.3s cubic-bezier(0.25,0.8,0.25,1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;padding:20px;}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.18;}
+.o1{width:350px;height:350px;background:#8b5cf6;top:10%;left:5%;animation:fl 16s ease-in-out infinite;}
+.o2{width:420px;height:420px;background:#ec4899;top:60%;right:5%;animation:fl 20s ease-in-out infinite 3s;}
+.o3{width:280px;height:280px;background:#f97316;top:35%;left:50%;animation:fl 14s ease-in-out infinite 6s;}
+@keyframes fl{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,-40px);}}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo i{font-size:2rem;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.logo span{font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.back{background:rgba(255,255,255,0.07);border:1px solid var(--gb);color:var(--muted)!important;padding:9px 20px;border-radius:30px;font-size:0.85rem;text-decoration:none;transition:var(--tr);}
+.back:hover{background:rgba(255,255,255,0.13);color:#fff!important;}
+.box{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--gb);border-radius:22px;padding:40px;box-shadow:0 12px 50px rgba(0,0,0,0.4);max-width:900px;margin:0 auto;}
+h1{font-size:1.85rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;}
+.sub{color:var(--muted);font-size:0.93rem;margin-bottom:28px;}
+.step{background:rgba(255,255,255,0.03);border:1px solid var(--gb);border-radius:16px;padding:22px;margin-bottom:16px;}
+.step-label{font-size:0.8rem;font-weight:700;color:var(--p2);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.step-num{width:22px;height:22px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;color:#fff;flex-shrink:0;}
+.upload-zone{border:2px dashed rgba(139,92,246,0.35);border-radius:14px;padding:36px;text-align:center;cursor:pointer;transition:var(--tr);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--p);background:rgba(139,92,246,0.05);}
+.upload-zone i{font-size:2.5rem;color:var(--p);display:block;margin-bottom:10px;}
+.upload-zone p{font-size:0.85rem;color:var(--muted);}
+.upload-zone input{display:none;}
+.prev-img{max-width:100%;max-height:200px;border-radius:10px;margin-top:12px;display:none;margin-left:auto;margin-right:auto;}
+textarea{width:100%;padding:16px 18px;background:var(--card);border:1.5px solid var(--gb);border-radius:14px;color:var(--text);font-size:0.95rem;font-family:'Poppins',sans-serif;outline:none;transition:var(--tr);resize:vertical;min-height:80px;}
+textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(139,92,246,0.15);}
+textarea::placeholder{color:var(--muted);opacity:0.7;}
+.model-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.mopt{background:var(--card);border:1.5px solid var(--gb);color:var(--text);padding:10px 18px;border-radius:12px;font-size:0.88rem;font-weight:600;cursor:pointer;transition:var(--tr);flex:1;text-align:center;}
+.mopt.on{background:var(--p);border-color:var(--p);}
+.mopt:hover:not(.on){border-color:var(--p);}
+.go{width:100%;padding:17px;background:linear-gradient(135deg,#8b5cf6,#ec4899);border:none;color:#fff;font-size:1rem;font-weight:700;border-radius:14px;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 20px rgba(139,92,246,0.3);margin-top:16px;position:relative;overflow:hidden;}
+.go::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:0.5s;}
+.go:hover{transform:translateY(-2px);}
+.go:hover::before{left:100%;}
+.go:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.spin-wrap{display:none;flex-direction:column;align-items:center;gap:18px;padding:36px 0;}
+.spin-wrap.show{display:flex;}
+.spinner{width:56px;height:56px;border:5px solid rgba(255,255,255,0.08);border-radius:50%;border-top-color:#8b5cf6;animation:spin 0.9s linear infinite;position:relative;}
+.spinner::after{content:'';position:absolute;inset:-5px;border:5px solid transparent;border-radius:50%;border-top-color:#ec4899;animation:spin 1.4s linear infinite reverse;opacity:0.6;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.result{display:none;}
+.result.show{display:block;animation:fu 0.4s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.img-panel{border-radius:14px;overflow:hidden;}
+.img-panel img{width:100%;display:block;border-radius:14px;}
+.img-label{text-align:center;font-size:0.82rem;color:var(--muted);margin-top:6px;}
+.dl-row{margin-top:14px;display:flex;gap:10px;}
+.dact{background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);color:var(--p2);padding:10px 18px;border-radius:11px;font-size:0.88rem;text-decoration:none;transition:var(--tr);display:flex;align-items:center;gap:8px;cursor:pointer;}
+.dact:hover{background:var(--p);color:#fff;border-color:var(--p);}
+.err{background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.25);border-radius:12px;padding:14px 18px;color:#ff6b6b;font-size:0.88rem;margin-top:12px;display:none;}
+.err.show{display:block;}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:0.82rem;}
+footer a{color:var(--p);}
+@media(max-width:560px){.compare{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div style="max-width:940px;margin:0 auto;">
+  <div class="topbar">
+    <a href="/" class="logo"><i class="fa fa-images"></i><span>Image-to-Image AI</span></a>
+    <a href="/" class="back"><i class="fa fa-arrow-left me-1"></i>Home</a>
+  </div>
+  <div class="box">
+    <h1><i class="fa fa-images me-2" style="color:var(--p)"></i>Image-to-Image AI Editor</h1>
+    <p class="sub">Upload a photo and describe how you want to transform it. Powered by Seedream 5.0 and GPT Image 2.</p>
+
+    <div class="step">
+      <div class="step-label"><span class="step-num">1</span>Upload Your Image</div>
+      <div class="upload-zone" id="dz" onclick="document.getElementById('fi').click()">
+        <input type="file" id="fi" accept="image/*">
+        <i class="fa fa-cloud-arrow-up"></i>
+        <p>Click or drag & drop an image here (JPG, PNG, WEBP)</p>
+        <img id="prevImg" class="prev-img" src="" alt="">
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-label"><span class="step-num">2</span>Describe the Transformation</div>
+      <textarea id="prompt" placeholder="Describe how to transform the image... e.g. 'Make it look like a painting', 'Add snow to the background', 'Turn into anime style', 'Make it night time'"></textarea>
+    </div>
+
+    <div class="step">
+      <div class="step-label"><span class="step-num">3</span>Choose AI Model</div>
+      <div class="model-row">
+        <div class="mopt on" id="m1" onclick="setModel('seedream')">Seedream 5.0</div>
+        <div class="mopt" id="m2" onclick="setModel('gpt-image-2')">GPT Image 2</div>
+      </div>
+    </div>
+
+    <button class="go" id="goBtn" onclick="transform()" disabled><i class="fa fa-wand-magic-sparkles"></i>Transform Image</button>
+    <div class="err" id="err"></div>
+    <div class="spin-wrap" id="sw">
+      <div class="spinner"></div>
+      <p style="color:var(--muted)">AI is transforming your image...</p>
+      <p style="color:var(--muted);font-size:0.82rem;">This may take 20-40 seconds. Please wait.</p>
+    </div>
+    <div class="result mt-4" id="res">
+      <div class="compare">
+        <div class="img-panel"><img id="origImg" src="" alt="Original"><div class="img-label">Original</div></div>
+        <div class="img-panel"><img id="outImg" src="" alt="Transformed"><div class="img-label">Transformed</div></div>
+      </div>
+      <div class="dl-row">
+        <a id="dlBtn" href="#" download="transformed.png" class="dact"><i class="fa fa-download"></i>Download Result</a>
+        <button class="dact" onclick="transform()"><i class="fa fa-rotate"></i>Transform Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><p>Made by <a href="/">David Cyril</a></p></footer>
+<script>
+const API='https://apis.davidcyril.name.ng';
+let model='seedream',fileData=null,fileObj=null;
+function setModel(m){model=m;document.getElementById('m1').classList.toggle('on',m==='seedream');document.getElementById('m2').classList.toggle('on',m==='gpt-image-2');}
+function sh(id,v){document.getElementById(id).classList.toggle('show',v!==false);}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('show');}
+
+document.getElementById('fi').addEventListener('change',e=>{
+  fileObj=e.target.files[0];
+  if(!fileObj)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{fileData=ev.target.result;const p=document.getElementById('prevImg');p.src=fileData;p.style.display='block';document.getElementById('origImg').src=fileData;document.getElementById('goBtn').disabled=false;};
+  reader.readAsDataURL(fileObj);
+});
+const dz=document.getElementById('dz');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){document.getElementById('fi').files=e.dataTransfer.files;document.getElementById('fi').dispatchEvent(new Event('change'));}});
+
+async function transform(){
+  const prompt=document.getElementById('prompt').value.trim();
+  if(!fileObj){showErr('Please upload an image first');return;}
+  if(!prompt){showErr('Please describe how to transform the image');return;}
+  document.getElementById('err').classList.remove('show');sh('res',false);sh('sw');
+  document.getElementById('goBtn').disabled=true;
+  try{
+    const fd=new FormData();fd.append('image',fileObj);fd.append('prompt',prompt);
+    const r=await fetch(`${API}/imageToImage/${model}`,{method:'POST',body:fd});
+    const d=await r.json();sh('sw',false);
+    if(!d||d.status===false){showErr(d.message||'Transformation failed. Try a different prompt or image.');document.getElementById('goBtn').disabled=false;return;}
+    const imgUrl=d.image||d.url||d.result||d.data||d.output;
+    if(!imgUrl){showErr('No result image returned. Please try again.');document.getElementById('goBtn').disabled=false;return;}
+    const src=imgUrl.startsWith('http')?imgUrl:`data:image/png;base64,${imgUrl}`;
+    document.getElementById('outImg').src=src;
+    document.getElementById('dlBtn').href=src;
+    sh('res');
+  }catch(e){sh('sw',false);showErr('Network error. Please try again.');}
+  document.getElementById('goBtn').disabled=false;
+}
+</script>
+</body>
+</html>

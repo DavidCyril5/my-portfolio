@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Generator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<style>
+.pw-display{background:var(--bg2);border:2px solid rgba(255,215,0,0.3);border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:24px;font-family:monospace;word-break:break-all}
+.pw-text{flex:1;font-size:20px;font-weight:600;color:var(--accent);letter-spacing:2px}
+.strength-bar{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin:16px 0 8px}
+.strength-fill{height:100%;border-radius:4px;transition:all .3s}
+.strength-label{font-size:13px;font-weight:600}
+.opt-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.opt-row:last-of-type{border-bottom:none}
+.opt-label{font-size:14px;color:var(--text)}
+.toggle{width:44px;height:24px;background:var(--card2);border-radius:12px;cursor:pointer;position:relative;transition:background .2s}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on::after{transform:translateX(20px)}
+.history-pw{display:flex;align-items:center;justify-content:space-between;background:var(--card2);padding:10px 16px;border-radius:10px;margin-bottom:8px;font-family:monospace;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#30cfd0,#330867)"><i class="fa fa-key" style="color:#fff"></i></div>
+      <h1>Password Generator</h1>
+      <p>Generate strong, secure and random passwords instantly</p>
+    </div>
+
+    <div style="max-width:580px;margin:0 auto 40px">
+      <div class="card">
+        <div class="pw-display">
+          <span class="pw-text" id="pwText">Click Generate</span>
+          <button onclick="copyPw()" class="btn btn-secondary btn-sm"><i class="fa fa-copy"></i></button>
+          <button onclick="generate()" class="btn btn-secondary btn-sm"><i class="fa fa-refresh"></i></button>
+        </div>
+
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <span class="strength-label" id="strengthLabel"></span>
+          <span id="entropyLabel" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <label style="font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between">
+            Length <span id="lenVal" style="color:var(--accent);font-weight:700">16</span>
+          </label>
+          <input type="range" min="4" max="64" value="16" id="lenRange" oninput="document.getElementById('lenVal').textContent=this.value;generate()">
+        </div>
+
+        <div class="opt-row">
+          <span class="opt-label">Uppercase (A-Z)</span>
+          <div class="toggle on" id="togUpper" onclick="toggle(this);generate()"></div>
+        </div>
+        <div class="opt-row">
+          <span class="opt-label">Lowercase (a-z)</span>
+          <div class="toggle on" id="togLower" onclick="toggle(this);generate()"></div>
+        </div>
+        <div class="opt-row">
+          <span class="opt-label">Numbers (0-9)</span>
+          <div class="toggle on" id="togNum" onclick="toggle(this);generate()"></div>
+        </div>
+        <div class="opt-row">
+          <span class="opt-label">Symbols (!@#$...)</span>
+          <div class="toggle on" id="togSym" onclick="toggle(this);generate()"></div>
+        </div>
+        <div class="opt-row">
+          <span class="opt-label">Exclude Ambiguous (0O1lI)</span>
+          <div class="toggle" id="togAmb" onclick="toggle(this);generate()"></div>
+        </div>
+
+        <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="generate()"><i class="fa fa-key"></i> Generate Password</button>
+      </div>
+
+      <div style="margin-top:20px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px"><i class="fa fa-history" style="margin-right:6px"></i>Recent passwords</p>
+        <div id="historyList"></div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const upper='ABCDEFGHIJKLMNOPQRSTUVWXYZ',lower='abcdefghijklmnopqrstuvwxyz',nums='0123456789',syms='!@#$%^&*()_+-=[]{}|;:,.<>?',ambig='0O1lI';
+let pwHistory=[];
+function toggle(el){el.classList.toggle('on');}
+function generate(){
+  const len=parseInt(document.getElementById('lenRange').value);
+  let chars='';
+  if(document.getElementById('togUpper').classList.contains('on'))chars+=upper;
+  if(document.getElementById('togLower').classList.contains('on'))chars+=lower;
+  if(document.getElementById('togNum').classList.contains('on'))chars+=nums;
+  if(document.getElementById('togSym').classList.contains('on'))chars+=syms;
+  if(!chars){chars=lower;}
+  if(document.getElementById('togAmb').classList.contains('on'))chars=chars.split('').filter(c=>!ambig.includes(c)).join('');
+  let pw='';
+  const arr=new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  arr.forEach(b=>pw+=chars[b%chars.length]);
+  document.getElementById('pwText').textContent=pw;
+  const ent=Math.log2(Math.pow(chars.length,len)).toFixed(1);
+  document.getElementById('entropyLabel').textContent=ent+' bits entropy';
+  updateStrength(len,chars.length);
+  pwHistory.unshift(pw);if(pwHistory.length>5)pwHistory.pop();
+  renderHistory();
+}
+function updateStrength(len,cSet){
+  const score=Math.min(100,((len/64)*50)+((cSet/95)*50));
+  const fill=document.getElementById('strengthFill');
+  fill.style.width=score+'%';
+  let color,label;
+  if(score<30){color='#ff4757';label='⚠ Weak';}
+  else if(score<55){color='#ffa502';label='▲ Fair';}
+  else if(score<75){color='var(--accent)';label='✓ Good';}
+  else{color='var(--success)';label='✔ Strong';}
+  fill.style.background=color;
+  document.getElementById('strengthLabel').textContent=label;
+  document.getElementById('strengthLabel').style.color=color;
+}
+function copyPw(){
+  const pw=document.getElementById('pwText').textContent;
+  navigator.clipboard.writeText(pw);
+  const btn=event.target.closest('button');
+  const orig=btn.innerHTML;
+  btn.innerHTML='<i class="fa fa-check"></i>';
+  setTimeout(()=>{btn.innerHTML=orig;},1500);
+}
+function renderHistory(){
+  document.getElementById('historyList').innerHTML=pwHistory.map(p=>`
+    <div class="history-pw">${p}<button onclick="navigator.clipboard.writeText('${p}')" style="background:none;border:none;color:var(--muted);cursor:pointer"><i class="fa fa-copy"></i></button></div>
+  `).join('');
+}
+generate();
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code Generator | David Cyril</title>
+<link rel="icon" href="https://files.catbox.moe/4hq1u5.jpg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="site-logo"><i class="fa-solid fa-code" style="color:var(--accent)"></i> David<span style="color:var(--accent)">Cyril</span></a>
+  <a href="/" class="back-btn"><i class="fa fa-arrow-left"></i> Back Home</a>
+</header>
+<div class="page-wrap">
+  <div class="container">
+    <div class="tool-hero">
+      <div class="tool-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e)"><i class="fa fa-qrcode" style="color:var(--accent)"></i></div>
+      <h1>QR Code Generator</h1>
+      <p>Generate custom QR codes for URLs, text, contacts and more</p>
+    </div>
+
+    <div style="max-width:580px;margin:0 auto 40px">
+      <div class="card">
+        <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px">Enter URL or text</label>
+        <textarea id="qrInput" class="input-field" rows="3" placeholder="https://davidcyril.name.ng" oninput="generate()"></textarea>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Foreground</label>
+            <div style="display:flex;align-items:center;gap:10px"><input type="color" id="fgColor" value="#FFD700" oninput="generate()" style="width:48px;height:40px;border:none;background:none;cursor:pointer;border-radius:8px"><span id="fgHex" style="font-size:13px;font-family:monospace">#FFD700</span></div>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Background</label>
+            <div style="display:flex;align-items:center;gap:10px"><input type="color" id="bgColor" value="#0d0d0d" oninput="generate()" style="width:48px;height:40px;border:none;background:none;cursor:pointer;border-radius:8px"><span id="bgHex" style="font-size:13px;font-family:monospace">#0d0d0d</span></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Size: <span id="sizeVal">256</span>px</label>
+          <input type="range" id="qrSize" min="128" max="512" value="256" oninput="generate()" style="width:100%;accent-color:var(--accent)">
+        </div>
+
+        <div id="qrWrap" style="display:none;text-align:center;margin:24px 0">
+          <canvas id="qrCanvas" style="border-radius:16px;max-width:100%"></canvas>
+        </div>
+
+        <div id="qrBtns" style="display:none;display:flex;gap:10px;justify-content:center">
+          <button class="btn btn-primary" onclick="downloadQR()"><i class="fa fa-download"></i> Download PNG</button>
+          <button class="btn btn-secondary" onclick="copyQR()"><i class="fa fa-copy"></i> Copy</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <p style="font-size:14px;font-weight:600;margin-bottom:12px"><i class="fa fa-bolt" style="color:var(--accent);margin-right:8px"></i>Quick Templates</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="useTemplate('url')"><i class="fa fa-link"></i> URL</button>
+          <button class="btn btn-secondary btn-sm" onclick="useTemplate('tel')"><i class="fa fa-phone"></i> Phone</button>
+          <button class="btn btn-secondary btn-sm" onclick="useTemplate('email')"><i class="fa fa-envelope"></i> Email</button>
+          <button class="btn btn-secondary btn-sm" onclick="useTemplate('wifi')"><i class="fa fa-wifi"></i> WiFi</button>
+          <button class="btn btn-secondary btn-sm" onclick="useTemplate('sms')"><i class="fa fa-comment"></i> SMS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer">Built by <a href="/">David Cyril</a></footer>
+</div>
+<script>
+const templates={url:'https://davidcyril.name.ng',tel:'tel:+2349066528353',email:'mailto:Davidcyril209@gmail.com',wifi:'WIFI:T:WPA;S:MyNetwork;P:MyPassword;;',sms:'sms:+2349066528353?body=Hello%20David!'};
+function useTemplate(t){document.getElementById('qrInput').value=templates[t];generate();}
+
+function generate(){
+  const text=document.getElementById('qrInput').value.trim();
+  const fg=document.getElementById('fgColor').value;
+  const bg=document.getElementById('bgColor').value;
+  const size=parseInt(document.getElementById('qrSize').value);
+  document.getElementById('fgHex').textContent=fg.toUpperCase();
+  document.getElementById('bgHex').textContent=bg.toUpperCase();
+  document.getElementById('sizeVal').textContent=size;
+  if(!text){document.getElementById('qrWrap').style.display='none';document.getElementById('qrBtns').style.display='none';return;}
+  const canvas=document.getElementById('qrCanvas');
+  QRCode.toCanvas(canvas,text,{width:size,color:{dark:fg,light:bg},margin:2},err=>{
+    if(!err){document.getElementById('qrWrap').style.display='block';document.getElementById('qrBtns').style.display='flex';}
+  });
+}
+function downloadQR(){
+  const canvas=document.getElementById('qrCanvas');
+  const a=document.createElement('a');a.download='qrcode.png';a.href=canvas.toDataURL();a.click();
+}
+function copyQR(){
+  const canvas=document.getElementById('qrCanvas');
+  canvas.toBlob(blob=>{navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);});
+}
+generate();
+</script>
+</body>
+</html>
